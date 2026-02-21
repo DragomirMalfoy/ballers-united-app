@@ -1,0 +1,1463 @@
+<!doctype html>
+<html lang="de"><head>
+<meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Ballers United – Coach Tracker</title>
+
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#0b0b0f">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+
+<style>
+:root{--bg:#0b0b0f;--muted:#a8a8b3;--text:#f4f4f7;--gold:#d4af37;--line:#242433;--chip:#1a1a26;--shadow:0 10px 30px rgba(0,0,0,.35);--r:22px;--mono:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;--sans:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;--brandFont: "Cinzel", "Trajan Pro", "Georgia", serif;--uiFont: "Montserrat","Inter",ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;}
+*{box-sizing:border-box} body{margin:0;font-family:var(--uiFont);color:var(--text);background:
+radial-gradient(1200px 800px at 20% -10%, rgba(212,175,55,.20), transparent 55%),
+radial-gradient(900px 600px at 120% 10%, rgba(90,140,255,.15), transparent 55%), var(--bg)}
+header{position:sticky;top:0;z-index:9;background:rgba(11,11,15,.82);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.wrap{max-width:1150px;margin:0 auto;padding:14px 16px}
+.topbar{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap}
+.brand{display:flex;gap:12px;align-items:center}
+.logo{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;font-weight:900;color:var(--gold);
+background:linear-gradient(145deg, rgba(212,175,55,.35), rgba(212,175,55,.10));border:1px solid rgba(212,175,55,.35);box-shadow:var(--shadow)}
+.brand h1{margin:0;font-size:16px;line-height:1.1;font-family:var(--brandFont);letter-spacing:.4px} .brand small{display:block;color:var(--muted);font-weight:600;margin-top:2px}
+.tabs{display:flex;gap:8px;flex-wrap:wrap} .tab{background:transparent;color:var(--muted);border:1px solid var(--line);padding:8px 10px;border-radius:999px;cursor:pointer;font-weight:900}
+.tab.active{color:var(--text);border-color:rgba(212,175,55,.65);background:rgba(212,175,55,.16)}
+main{padding:18px 16px 40px} .grid{max-width:1150px;margin:0 auto;display:grid;gap:14px}
+.row{display:grid;grid-template-columns:1fr;gap:14px} @media(min-width:900px){.row.two{grid-template-columns:1.2fr .8fr}}
+.card{background:rgba(18,18,26,.92);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);padding:14px}
+.card h2{margin:0 0 8px;font-size:14px;font-family:var(--brandFont);letter-spacing:.35px} .muted{color:var(--muted)} .sep{height:1px;background:var(--line);margin:12px 0}
+.btn{background:rgba(212,175,55,.18);border:1px solid rgba(212,175,55,.55);color:var(--text);padding:8px 10px;border-radius:12px;cursor:pointer;font-weight:900}
+.btn.secondary{background:transparent;border-color:var(--line);color:var(--muted)}
+.btn.danger{background:rgba(255,90,106,.12);border-color:rgba(255,90,106,.35)}
+.controls{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+input,select,textarea{width:100%;background:rgba(10,10,14,.6);border:1px solid var(--line);color:var(--text);padding:10px;border-radius:12px;outline:none}
+textarea{min-height:86px;resize:vertical} label{font-size:12px;color:var(--muted);display:block;margin:10px 0 6px}
+.inline{display:grid;grid-template-columns:1fr 1fr;gap:10px} @media(max-width:520px){.inline{grid-template-columns:1fr}}
+table{width:100%;border-collapse:collapse;font-size:13px} th,td{padding:10px 8px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+th{color:var(--muted);font-weight:900;font-size:12px} .mono{font-family:var(--mono)}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:4px 8px;border-radius:999px;background:var(--chip);border:1px solid var(--line);color:var(--muted);font-weight:900;font-size:12px;margin-right:6px;margin-top:6px}
+.chip.gold{border-color:rgba(212,175,55,.4);color:var(--text);background:rgba(212,175,55,.12)}
+.pill{font-family:var(--mono);padding:2px 6px;border-radius:8px;background:rgba(255,255,255,.06);border:1px solid var(--line);color:var(--muted);font-size:12px}
+.notice{border-left:3px solid rgba(212,175,55,.55);background:rgba(212,175,55,.08);padding:10px;border-radius:12px}
+.row-actions{display:flex;gap:8px;flex-wrap:wrap}
+
+.slotGrid{display:grid;grid-template-columns:1fr;gap:10px}
+@media(min-width:900px){.slotGrid{grid-template-columns:1fr 1fr}}
+.pitch{border:1px solid rgba(212,175,55,.28);background:rgba(10,10,14,.35);border-radius:18px;padding:12px}
+.slot{display:flex;align-items:center;justify-content:space-between;gap:10px;border:1px dashed rgba(212,175,55,.35);border-radius:14px;padding:10px;margin:8px 0;background:rgba(212,175,55,.06)}
+.slot strong{font-family:var(--brandFont);letter-spacing:.25px}
+.draggable{border:1px solid var(--line);background:rgba(18,18,26,.92);border-radius:14px;padding:10px;margin:8px 0;cursor:grab}
+.draggable:active{cursor:grabbing}
+.kv{display:flex;gap:10px;flex-wrap:wrap}
+.kv .chip{margin-top:0}
+.small{font-size:12px}
+
+</style></head>
+<body>
+<header><div class="wrap"><div class="topbar">
+<div class="brand"><div class="logo">BU</div><div><h1>Ballers United – Coach Tracker</h1><small>Coach-zentriert: Training, Entwicklung, Match-Stats & Spielplan</small></div></div>
+<div class="tabs" id="tabs"></div>
+</div></div></header>
+<main><div class="grid" id="view"></div></main>
+
+<script>
+const STORAGE_KEY="bu_coach_tracker_v1";
+const SEED={"meta": {"teamName": "Ballers United", "createdAt": "2026-02-21T00:49:59.186559Z", "coachMode": true}, "players": [{"id": "251bb636c222330c-19c7dacbf92", "name": "Animesh", "number": 99, "dob": "1993-11-20", "nation": "Österreich", "position": "TW", "squadRole": "Kern", "isJoker": false, "role": "Goalkeeper (Build-up)", "notes": "", "attrs": {"stamina": 11, "pace": 10, "passing": 11, "defending": 11, "shooting": 6, "positioning": 12, "communication": 12, "fitness": 11}, "createdAt": "2026-02-21T00:49:59.186246Z"}, {"id": "6e6707e8b4259f62-19c7dacbf92", "name": "Arian", "number": 47, "dob": "2004-11-04", "nation": "Österreich", "position": "DF", "squadRole": "Vereinsspieler", "isJoker": true, "role": "Defender (Joker)", "notes": "", "attrs": {"stamina": 11, "pace": 11, "passing": 10, "defending": 12, "shooting": 8, "positioning": 11, "communication": 10, "fitness": 11}, "createdAt": "2026-02-21T00:49:59.186268Z"}, {"id": "d4d8e25a4d6f64e4-19c7dacbf92", "name": "Baki", "number": 14, "dob": "1994-08-30", "nation": "Österreich", "position": "DF", "squadRole": "Vereinsspieler", "isJoker": true, "role": "Defender (Joker)", "notes": "", "attrs": {"stamina": 11, "pace": 11, "passing": 10, "defending": 12, "shooting": 8, "positioning": 11, "communication": 10, "fitness": 11}, "createdAt": "2026-02-21T00:49:59.186273Z"}, {"id": "1ea2fd93593d31a0-19c7dacbf92", "name": "Bleon", "number": 20, "dob": "2001-05-12", "nation": "Österreich", "position": "ST", "squadRole": "Kern", "isJoker": false, "role": "Striker (Target)", "notes": "", "attrs": {"stamina": 10, "pace": 12, "passing": 10, "defending": 8, "shooting": 12, "positioning": 10, "communication": 9, "fitness": 10}, "createdAt": "2026-02-21T00:49:59.186278Z"}, {"id": "4fbab733e5a4e14f-19c7dacbf92", "name": "Daniel", "number": 8, "dob": "1995-06-22", "nation": "Österreich", "position": "ST", "squadRole": "Kern", "isJoker": false, "role": "Striker (Link/Wand)", "notes": "", "attrs": {"stamina": 10, "pace": 12, "passing": 10, "defending": 8, "shooting": 12, "positioning": 10, "communication": 9, "fitness": 10}, "createdAt": "2026-02-21T00:49:59.186283Z"}, {"id": "85bdf798bebf85db-19c7dacbf92", "name": "Dave", "number": 15, "dob": "1994-04-20", "nation": "Österreich", "position": "DF", "squadRole": "Kern", "isJoker": false, "role": "Defender (Pace/Recover)", "notes": "", "attrs": {"stamina": 11, "pace": 11, "passing": 10, "defending": 12, "shooting": 8, "positioning": 11, "communication": 10, "fitness": 11}, "createdAt": "2026-02-21T00:49:59.186287Z"}, {"id": "2b4cf831313e1afc-19c7dacbf92", "name": "Mahian", "number": 17, "dob": "2002-07-23", "nation": "Österreich", "position": "DF", "squadRole": "Kern", "isJoker": false, "role": "Hybrid (MF/DF Motor)", "notes": "", "attrs": {"stamina": 11, "pace": 11, "passing": 10, "defending": 12, "shooting": 8, "positioning": 11, "communication": 10, "fitness": 11}, "createdAt": "2026-02-21T00:49:59.186291Z"}, {"id": "d1a4f1e9f9843d95-19c7dacbf92", "name": "Mario", "number": 22, "dob": "1993-03-20", "nation": "Österreich", "position": "MF", "squadRole": "Kern", "isJoker": false, "role": "Utility", "notes": "", "attrs": {"stamina": 11, "pace": 11, "passing": 12, "defending": 10, "shooting": 9, "positioning": 10, "communication": 10, "fitness": 11}, "createdAt": "2026-02-21T00:49:59.186300Z"}, {"id": "2e13ce16347468ba-19c7dacbf92", "name": "Obl", "number": 44, "dob": "2002-04-06", "nation": "Österreich", "position": "TW", "squadRole": "Vereinsspieler", "isJoker": true, "role": "Goalkeeper (Joker)", "notes": "", "attrs": {"stamina": 11, "pace": 10, "passing": 11, "defending": 11, "shooting": 6, "positioning": 12, "communication": 12, "fitness": 11}, "createdAt": "2026-02-21T00:49:59.186306Z"}, {"id": "a3042396c776566-19c7dacbf92", "name": "Rasih", "number": 4, "dob": "1994-11-20", "nation": "Österreich", "position": "DF", "squadRole": "Kern", "isJoker": false, "role": "Defender (Safe)", "notes": "", "attrs": {"stamina": 11, "pace": 11, "passing": 10, "defending": 12, "shooting": 8, "positioning": 11, "communication": 10, "fitness": 11}, "createdAt": "2026-02-21T00:49:59.186312Z"}, {"id": "d022098ceae15772-19c7dacbf92", "name": "Reisi", "number": 7, "dob": "1994-08-10", "nation": "Österreich", "position": "MF", "squadRole": "Vereinsspieler", "isJoker": true, "role": "Midfielder (Joker)", "notes": "", "attrs": {"stamina": 11, "pace": 11, "passing": 12, "defending": 10, "shooting": 9, "positioning": 10, "communication": 10, "fitness": 11}, "createdAt": "2026-02-21T00:49:59.186316Z"}, {"id": "2ce79deba5a46a95-19c7dacbf92", "name": "Rexha", "number": 9, "dob": "1996-09-27", "nation": "Österreich", "position": "MF", "squadRole": "Kern", "isJoker": false, "role": "Midfielder", "notes": "", "attrs": {"stamina": 11, "pace": 11, "passing": 12, "defending": 10, "shooting": 9, "positioning": 10, "communication": 10, "fitness": 11}, "createdAt": "2026-02-21T00:49:59.186320Z"}, {"id": "42181a3d5a2122d0-19c7dacbf92", "name": "Robin", "number": 10, "dob": "1994-11-02", "nation": "Österreich", "position": "MF", "squadRole": "Kern", "isJoker": false, "role": "Captain / Playmaker", "notes": "", "attrs": {"stamina": 11, "pace": 11, "passing": 12, "defending": 10, "shooting": 9, "positioning": 10, "communication": 10, "fitness": 11}, "createdAt": "2026-02-21T00:49:59.186324Z"}, {"id": "ed170143c677f47f-19c7dacbf92", "name": "Rohan", "number": 2, "dob": "2003-04-26", "nation": "Österreich", "position": "DF", "squadRole": "Kern", "isJoker": false, "role": "Defender (Development)", "notes": "", "attrs": {"stamina": 11, "pace": 11, "passing": 10, "defending": 12, "shooting": 8, "positioning": 11, "communication": 10, "fitness": 11}, "createdAt": "2026-02-21T00:49:59.186327Z"}, {"id": "ef5671d194874982-19c7dacbf92", "name": "Sadi", "number": 27, "dob": "2000-10-12", "nation": "Österreich", "position": "DF", "squadRole": "Kern", "isJoker": false, "role": "Ball-Playing Defender", "notes": "", "attrs": {"stamina": 11, "pace": 11, "passing": 10, "defending": 12, "shooting": 8, "positioning": 11, "communication": 10, "fitness": 11}, "createdAt": "2026-02-21T00:49:59.186330Z"}, {"id": "8ddfe292c9114eca-19c7dacbf92", "name": "Tazimm", "number": 80, "dob": "2002-01-03", "nation": "Österreich", "position": "ST", "squadRole": "Gelegenheitsspieler", "isJoker": true, "role": "Runner (Depth)", "notes": "", "attrs": {"stamina": 10, "pace": 12, "passing": 10, "defending": 8, "shooting": 12, "positioning": 10, "communication": 9, "fitness": 10}, "createdAt": "2026-02-21T00:49:59.186334Z"}, {"id": "396e68698c8d48a7-19c7dacbf92", "name": "Werdi", "number": 26, "dob": "1994-02-26", "nation": "Österreich", "position": "MF", "squadRole": "Vereinsspieler", "isJoker": true, "role": "Midfielder (Joker)", "notes": "", "attrs": {"stamina": 11, "pace": 11, "passing": 12, "defending": 10, "shooting": 9, "positioning": 10, "communication": 10, "fitness": 11}, "createdAt": "2026-02-21T00:49:59.186338Z"}, {"id": "c69f4cfb432684e5-19c7dacbf92", "name": "Edi", "number": 19, "dob": "2002-02-11", "nation": "Österreich", "position": "MF", "squadRole": "Vereinsspieler", "isJoker": true, "role": "Midfielder (Joker)", "notes": "", "attrs": {"stamina": 11, "pace": 11, "passing": 12, "defending": 10, "shooting": 9, "positioning": 10, "communication": 10, "fitness": 11}, "createdAt": "2026-02-21T00:49:59.186342Z"}, {"id": "c30b3d91ec1a31c1-19c7dacbf92", "name": "Dennis", "number": 21, "dob": "1996-07-24", "nation": "Österreich", "position": "ST", "squadRole": "Gelegenheitsspieler", "isJoker": true, "role": "Striker (Hold-up)", "notes": "", "attrs": {"stamina": 10, "pace": 12, "passing": 10, "defending": 8, "shooting": 12, "positioning": 10, "communication": 9, "fitness": 10}, "createdAt": "2026-02-21T00:49:59.186357Z"}, {"id": "808d9068c6d37f88-19c7dacbf92", "name": "Flavio", "number": 11, "dob": "2005-01-17", "nation": "Österreich", "position": "ST", "squadRole": "Vereinsspieler", "isJoker": true, "role": "Striker (Joker)", "notes": "", "attrs": {"stamina": 10, "pace": 12, "passing": 10, "defending": 8, "shooting": 12, "positioning": 10, "communication": 9, "fitness": 10}, "createdAt": "2026-02-21T00:49:59.186361Z"}], "sessions": [], "matches": [], "schedule": [{"date": "2026-03-15", "time": "09:00", "opponent": "Viktoria Altmannsdorf", "home": true, "location": "ASK Erlaa"}, {"date": "2026-04-12", "time": "09:00", "opponent": "FC Equipo", "home": false, "location": "ASK Erlaa"}, {"date": "2026-04-26", "time": "10:00", "opponent": "FC Union 12", "home": true, "location": "ASK Erlaa"}, {"date": "2026-05-01", "time": "10:00", "opponent": "The Branko Boys", "home": false, "location": "ASK Erlaa"}, {"date": "2026-05-10", "time": "09:00", "opponent": "1. FC Court", "home": true, "location": "ASK Erlaa"}, {"date": "2026-05-31", "time": "20:00", "opponent": "Die Käfig Krocha", "home": false, "location": "ASK Erlaa"}, {"date": "2026-06-07", "time": "20:00", "opponent": "FC Haudaneben 25", "home": true, "location": "ASK Erlaa"}, {"date": "2026-06-14", "time": "10:00", "opponent": "FC Wiesen", "home": false, "location": "ASK Erlaa"}], "settings": {"tz": "Europe/Vienna", "baseGain": 0.2, "rpeMultiplier": 0.04, "maxGain": 0.6, "minGain": 0.05, "trainingAttendanceDefault": "Kern"}};
+
+const ATTRS=[["stamina","Ausdauer"],["pace","Tempo"],["passing","Passspiel"],["defending","Defensive"],["shooting","Abschluss"],["positioning","Positioning"],["communication","Kommunikation"],["fitness","Fitness"]];
+const FOCUS_PRESETS={"Kurzpass & Kombi":["passing","communication","positioning"],"Defensive & Verschieben":["defending","positioning","communication"],"Tempo & Kondition":["pace","stamina","fitness"],"Abschluss":["shooting","passing","positioning"],"Allround":["fitness","passing","positioning"]};
+const tabs=[{id:"dashboard",label:"Dashboard"},{id:"schedule",label:"Spielplan"},{id:"players",label:"Kader"},{id:"sessions",label:"Training"},{id:"library",label:"Trainingsbibliothek"},{id:"development",label:"Entwicklung"},{id:"planner",label:"Matchplanner"},{id:"matches",label:"Matches"},{id:"tactics",label:"Taktik"},{id:"backup",label:"Backup"}];
+let currentTab="dashboard";
+
+function loadState(){try{const raw=localStorage.getItem(STORAGE_KEY); if(!raw) return structuredClone(SEED); const p=JSON.parse(raw); return Object.assign(structuredClone(SEED),p);}catch(e){return structuredClone(SEED);}}
+function saveState(){localStorage.setItem(STORAGE_KEY,JSON.stringify(state));}
+let state=loadState();
+
+// Ensure new modules exist (backward compatible for existing localStorage)
+state.library = state.library || defaultLibrary();
+state.plans = state.plans || [];
+state.matchPlans = state.matchPlans || [];
+state.players = state.players || [];
+state.players.forEach(p=>{ p.history = p.history || []; });
+state.meta = state.meta || {teamName:"Ballers United"};
+
+function el(h){const t=document.createElement("template"); t.innerHTML=h.trim(); return t.content.firstChild;}
+function clamp(n,a,b){return Math.max(a,Math.min(b,n));}
+function round1(n){return Math.round(n*10)/10;}
+function labelAttr(k){const f=ATTRS.find(x=>x[0]===k); return f?f[1]:k;}
+function escapeHtml(s){return (s||"").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;");}
+function escapeAttr(s){return escapeHtml(s).replaceAll('"',"&quot;");}
+
+
+
+function defaultLibrary(){
+  // Seeds for Kleinfeld Hobby-Team: warm-up, passing, finishing, transitions, conditioning
+  return [
+    {id:"dr1", title:"Warm-up: Mobility + Ball Mastery (10')", tags:["warmup","coordination"], equip:"Hütchen, Ball", setup:"20x20m", steps:[
+      "2' Mobilität (Hüfte/Knöchel), leichtes Laufen",
+      "4' Ballführung: innen/außen, Sohlenzüge, Richtungswechsel",
+      "4' Steigerungen mit Ball + kurzer Sprint (5–10m)"
+    ], coaching:["Langsam starten → warm werden","Kopf hoch, kleine Kontakte","Bei Kälte: Handschuhe/Mütze ok"]},
+    {id:"dr2", title:"Rondo 4v1 / 5v2 (12')", tags:["passing","kombination"], equip:"Hütchen, Bälle", setup:"8x8m (anpassen)", steps:[
+      "1–2 Kontakte, Ball zirkulieren",
+      "Verlierer geht in die Mitte",
+      "Progression: 1 Kontakt oder Pflicht-Doppelpass"
+    ], coaching:["Anspielwinkel schaffen","Erster Kontakt weg vom Gegner","Kommunikation: 'Klatsch', 'Dreh', 'Zeit'"]},
+    {id:"dr3", title:"Kombi → Abschluss (15')", tags:["passing","finishing"], equip:"Großes Tor, Hütchen, Bälle", setup:"Halbfeld / 25–35m", steps:[
+      "Passfolge über 2 Stationen → Steil/Klatsch → Abschluss",
+      "Wechsel links/rechts",
+      "Progression: Direktabschluss oder Abschluss nach 2 Kontakten"
+    ], coaching:["Pass in den Lauf","Schuss schnell nach Ballannahme","Nachschuss/Abpraller aktiv"]},
+    {id:"dr4", title:"Transition: 3 Sekunden Druck (12')", tags:["defending","transition"], equip:"Hütchen, 2 Mini-Tore", setup:"25x20m", steps:[
+      "3v3 + 2 Mini-Tore",
+      "Nach Ballverlust: Team hat 3 Sekunden für sofortigen Druck",
+      "Danach: in Formation zurück (kompakt)"
+    ], coaching:["Erste Reaktion zählt","Nächster Spieler attackiert, Rest sichert","Nicht wild jagen – nach 3 Sek. Ordnung"]},
+    {id:"dr5", title:"Kleinfeld-Match: 5+1 Prinzipien (20')", tags:["game"], equip:"Mini-Tore oder Großes Tor", setup:"je nach Platz", steps:[
+      "Spiel 4v4 / 5v5 auf Mini-Tore oder 5v5+TW",
+      "Regeln: max 2 Kontakte hinten, Rückpass ok, kein Dribbling hinten",
+      "Bonuspunkt für Tor nach Doppelpass"
+    ], coaching:["Dreiecke & Klatsch","Breite geben, dann innen spielen","Kompakt bleiben (Abstände!)"]}
+  ];
+}
+
+function svgLineChart(points, keys, width=760, height=260){
+  // points: [{date, attrs:{...}}], keys: ["passing","positioning"...]
+  if(!points || points.length===0) return `<p class="muted">Noch keine Historie vorhanden. Tipp: Nach jedem Training wird automatisch ein Snapshot für anwesende Spieler gespeichert.</p>`;
+  const pad=28;
+  const W=width, H=height;
+  const minY=1, maxY=20;
+  const xStep = (W-2*pad)/Math.max(1,(points.length-1));
+  function y(v){ return (H-pad) - ((v-minY)/(maxY-minY))*(H-2*pad); }
+  function x(i){ return pad + i*xStep; }
+  const grid = [];
+  for(let v=5; v<=20; v+=5){
+    grid.push(`<line x1="${pad}" y1="${y(v)}" x2="${W-pad}" y2="${y(v)}" stroke="rgba(255,255,255,.08)" />`);
+    grid.push(`<text x="${pad-6}" y="${y(v)+4}" fill="rgba(255,255,255,.38)" font-size="10" text-anchor="end">${v}</text>`);
+  }
+  const colors=["rgba(212,175,55,.90)","rgba(90,140,255,.85)","rgba(87,227,137,.85)","rgba(255,90,106,.85)"];
+  const paths = keys.map((k,idx)=>{
+    const d = points.map((p,i)=>`${i===0?"M":"L"} ${x(i)} ${y((p.attrs?.[k]??0))}`).join(" ");
+    return `<path d="${d}" fill="none" stroke="${colors[idx%colors.length]}" stroke-width="2.5" />`;
+  }).join("");
+  const dots = keys.map((k,idx)=>{
+    return points.map((p,i)=>`<circle cx="${x(i)}" cy="${y((p.attrs?.[k]??0))}" r="2.6" fill="${colors[idx%colors.length]}" />`).join("");
+  }).join("");
+  const xLabels = points.map((p,i)=>{
+    if(points.length>10 && i%2===1) return "";
+    const txt = (p.date||"").slice(5);
+    return `<text x="${x(i)}" y="${H-8}" fill="rgba(255,255,255,.38)" font-size="10" text-anchor="middle">${txt}</text>`;
+  }).join("");
+  const legend = keys.map((k,idx)=>`<span class="chip gold" style="border-color:${colors[idx%colors.length]}; background:rgba(255,255,255,.02)">${labelAttr(k)}</span>`).join("");
+  return `
+    <div class="controls" style="margin-bottom:8px;">${legend}</div>
+    <svg viewBox="0 0 ${W} ${H}" width="100%" height="${H}" style="background:rgba(10,10,14,.35); border:1px solid var(--line); border-radius:16px;">
+      ${grid.join("")}
+      ${paths}
+      ${dots}
+      ${xLabels}
+    </svg>
+  `;
+}
+
+function renderTabs(){const root=document.getElementById("tabs"); root.innerHTML=""; tabs.forEach(t=>{const b=el(`<button class="tab ${t.id===currentTab?"active":""}">${t.label}</button>`); b.onclick=()=>{currentTab=t.id; render();}; root.appendChild(b);});}
+function render(){renderTabs(); const v=document.getElementById("view"); v.innerHTML=""; 
+if(currentTab==="dashboard") v.appendChild(renderDashboard());
+if(currentTab==="schedule") v.appendChild(renderSchedule());
+if(currentTab==="players") v.appendChild(renderPlayers());
+if(currentTab==="sessions") v.appendChild(renderSessions());
+if(currentTab==="library") v.appendChild(renderLibrary());
+if(currentTab==="development") v.appendChild(renderDevelopment());
+if(currentTab==="planner") v.appendChild(renderPlanner());
+if(currentTab==="matches") v.appendChild(renderMatches());
+if(currentTab==="tactics") v.appendChild(renderTactics());
+if(currentTab==="backup") v.appendChild(renderBackup());
+}
+
+/* Dashboard */
+function renderDashboard(){
+  const players=state.players||[]; const sessions=state.sessions||[];
+  const coreCount=players.filter(p=>p.squadRole==="Kern").length; const jokerCount=players.length-coreCount;
+  const root=el(`<div class="grid"></div>`);
+  const top=el(`<div class="row two">
+    <div class="card">
+      <h2>Coach Dashboard</h2>
+      <div class="controls">
+        <span class="chip gold">Spieler: <span class="mono">${players.length}</span></span>
+        <span class="chip gold">Kern (Training): <span class="mono">${coreCount}</span></span>
+        <span class="chip">Joker (Matches): <span class="mono">${jokerCount}</span></span>
+        <span class="chip">Trainings: <span class="mono">${sessions.length}</span></span>
+      </div>
+      <div class="sep"></div>
+      <div class="notice">Training-Attendance wird standardmäßig nur für <b>Kernspieler</b> vorausgewählt (du kannst jederzeit ändern).</div>
+      <div class="sep"></div>
+      <h2>Nächste Spiele</h2>
+      ${renderNextGames()}
+      <div class="sep"></div>
+      <button class="btn secondary" id="icsBtn">Spielplan als .ics exportieren</button>
+    </div>
+    <div class="card">
+      <h2>Letzte Trainings</h2>
+      ${renderLastSessions()}
+    </div>
+  </div>`);
+  top.querySelector("#icsBtn").onclick=exportICS;
+  root.appendChild(top); return root;
+}
+
+function renderNextGames(){
+  const now=new Date();
+  const list=(state.schedule||[]).map(g=>({...g,dt:new Date(g.date+"T"+(g.time||"00:00")+":00")}))
+    .sort((a,b)=>a.dt-b.dt).filter(g=>g.dt>=new Date(now.getTime()-86400000)).slice(0,5);
+  if(!list.length) return `<p class="muted">Kein Spielplan.</p>`;
+  return `<table><thead><tr><th>Datum</th><th>Zeit</th><th>Match</th><th>Ort</th></tr></thead><tbody>`+
+    list.map(g=>`<tr><td class="mono">${g.date}</td><td class="mono">${g.time}</td><td><b>${g.home?"Ballers United":escapeHtml(g.opponent)}</b> vs <b>${g.home?escapeHtml(g.opponent):"Ballers United"}</b></td><td>${escapeHtml(g.location||"")}</td></tr>`).join("")+
+    `</tbody></table>`;
+}
+
+function renderLastSessions(){
+  const s=[...(state.sessions||[])].sort((a,b)=>(b.date||"").localeCompare(a.date||"")).slice(0,6);
+  if(!s.length) return `<p class="muted">Noch keine Trainings erfasst.</p>`;
+  return `<table><thead><tr><th>Datum</th><th>Fokus</th><th>RPE</th></tr></thead><tbody>`+
+    s.map(x=>`<tr><td class="mono">${x.date||"-"}</td><td>${(x.focus||[]).map(f=>`<span class="chip gold">${labelAttr(f)}</span>`).join("")}</td><td><span class="pill">${x.rpe||"-"}</span></td></tr>`).join("")+
+    `</tbody></table>`;
+}
+
+/* Spielplan */
+function renderSchedule(){
+  const root=el(`<div class="grid"></div>`);
+  const card=el(`<div class="card">
+    <div class="controls" style="justify-content:space-between;">
+      <h2 style="margin:0;">Spielplan 2026</h2>
+      <div class="controls">
+        <button class="btn secondary" id="icsBtn">.ics export</button>
+        <button class="btn" id="addBtn">+ Spiel</button>
+      </div>
+    </div>
+    <div class="sep"></div>
+    <div style="overflow:auto;">${renderScheduleTable()}</div>
+  </div>`);
+  card.querySelector("#icsBtn").onclick=exportICS;
+  card.querySelector("#addBtn").onclick=()=>openGameModal(null);
+  root.appendChild(card); return root;
+}
+function renderScheduleTable(){
+  const list=[...(state.schedule||[])].sort((a,b)=>(a.date+a.time).localeCompare(b.date+b.time));
+  if(!list.length) return `<p class="muted">Noch keine Spiele.</p>`;
+  return `<table><thead><tr><th>Datum</th><th>Zeit</th><th>Gegner</th><th>Heim/Auswärts</th><th>Ort</th><th>Aktion</th></tr></thead><tbody>`+
+    list.map((g,i)=>`<tr><td class="mono">${g.date}</td><td class="mono">${g.time}</td><td>${escapeHtml(g.opponent)}</td><td>${g.home?'<span class="chip gold">Heim</span>':'<span class="chip">Auswärts</span>'}</td><td>${escapeHtml(g.location||"")}</td>
+    <td><div class="row-actions"><button class="btn secondary" onclick="editGame(${i})">Bearbeiten</button><button class="btn danger" onclick="deleteGame(${i})">Löschen</button></div></td></tr>`).join("")+
+    `</tbody></table>`;
+}
+function openGameModal(idx){
+  const g = (idx===null) ? {date:new Date().toISOString().slice(0,10),time:"09:00",opponent:"",home:true,location:"ASK Erlaa"} : structuredClone(state.schedule[idx]);
+  const modal=el(`<div style="position:fixed; inset:0; background:rgba(0,0,0,.55); display:grid; place-items:center; padding:16px; z-index:999;">
+    <div class="card" style="max-width:820px; width:100%;">
+      <div class="controls" style="justify-content:space-between;"><h2 style="margin:0;">${idx===null?"Neues Spiel":"Spiel bearbeiten"}</h2><button class="btn secondary" id="close">Schließen</button></div>
+      <div class="inline" style="margin-top:10px;"><div><label>Datum</label><input id="date" type="date" value="${g.date}"></div><div><label>Zeit</label><input id="time" type="time" value="${g.time}"></div></div>
+      <label>Gegner</label><input id="opp" value="${escapeAttr(g.opponent||"")}">
+      <div class="inline"><div><label>Heim/Auswärts</label><select id="home"><option value="home" ${g.home?"selected":""}>Heim</option><option value="away" ${!g.home?"selected":""}>Auswärts</option></select></div>
+      <div><label>Ort</label><input id="loc" value="${escapeAttr(g.location||"")}"></div></div>
+      <label>Team-Feedback (für WhatsApp)</label><textarea id="teamFb" placeholder="Kurz & klar: Was war gut, was verbessern?">${escapeHtml(m.teamFeedback||"")}</textarea><div class="controls"><button class="btn secondary" id="copyFb">WhatsApp: Feedback kopieren</button></div><div class="sep"></div><div class="controls" style="justify-content:flex-end;"><button class="btn" id="save">Speichern</button></div>
+    </div></div>`);
+  modal.querySelector("#close").onclick=()=>modal.remove();
+  modal.querySelector("#save").onclick=()=>{
+    g.date=modal.querySelector("#date").value; g.time=modal.querySelector("#time").value||"00:00"; g.opponent=modal.querySelector("#opp").value.trim()||"TBD";
+    g.home=modal.querySelector("#home").value==="home"; g.location=modal.querySelector("#loc").value.trim();
+    if(idx===null) state.schedule.push(g); else state.schedule[idx]=g;
+    saveState(); render(); modal.remove();
+  };
+  document.body.appendChild(modal);
+}
+window.editGame=(i)=>openGameModal(i);
+window.deleteGame=(i)=>{ if(!confirm("Spiel wirklich löschen?")) return; state.schedule.splice(i,1); saveState(); render(); };
+
+function exportICS(){
+  const tzid="Europe/Vienna"; const dtstamp=new Date().toISOString().replace(/[-:]/g,"").split(".")[0]+"Z"; const dur=90;
+  function fmtLocal(ds,ts){const [y,m,d]=ds.split("-"); const [hh,mm]=ts.split(":"); return `${y}${m}${d}T${hh}${mm}00`;}
+  function esc(s){return (s||"").replace(/\\/g,"\\\\").replace(/,/g,"\\,").replace(/;/g,"\\;").replace(/\n/g,"\\n");}
+  const lines=["BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//Ballers United//Coach Tracker//DE","CALSCALE:GREGORIAN","METHOD:PUBLISH"];
+  (state.schedule||[]).forEach(g=>{
+    const uid=Math.random().toString(16).slice(2)+"@ballersunited";
+    const start=fmtLocal(g.date,g.time||"00:00");
+    const dt=new Date(g.date+"T"+(g.time||"00:00")+":00"); const endDt=new Date(dt.getTime()+dur*60000);
+    const end=endDt.toISOString().replace(/[-:]/g,"").split(".")[0]; const endLocal=end.slice(0,8)+"T"+end.slice(9,15);
+    const summary=g.home?`Ballers United vs. ${g.opponent}`:`${g.opponent} vs. Ballers United`;
+    lines.push("BEGIN:VEVENT","UID:"+uid,"DTSTAMP:"+dtstamp,`DTSTART;TZID=${tzid}:${start}`,`DTEND;TZID=${tzid}:${endLocal}`,
+      "SUMMARY:"+esc(summary),"LOCATION:"+esc(g.location||""),"DESCRIPTION:"+esc("Treffpunkt 45min vor Anstoß, Mitbringen: Trikot + Ausweis"),"END:VEVENT");
+  });
+  lines.push("END:VCALENDAR");
+  const blob=new Blob([lines.join("\r\n")+"\r\n"],{type:"text/calendar;charset=utf-8"});
+  const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="Ballers_United_Spielplan.ics"; document.body.appendChild(a); a.click(); a.remove();
+}
+
+/* Kader */
+function renderPlayers(){
+  const root=el(`<div class="grid"></div>`);
+  const card=el(`<div class="card">
+    <div class="controls" style="justify-content:space-between;"><h2 style="margin:0;">Kader (Coach View)</h2><button class="btn" id="add">+ Spieler</button></div>
+    <div class="sep"></div><div style="overflow:auto;">${renderPlayersTable()}</div>
+  </div>`);
+  card.querySelector("#add").onclick=()=>openPlayerModal(null);
+  root.appendChild(card); return root;
+}
+function renderPlayersTable(){
+  const ps=[...(state.players||[])].sort((a,b)=>a.name.localeCompare(b.name));
+  return `<table><thead><tr><th>Name</th><th>#</th><th>Pos</th><th>Status</th><th>Rolle</th>`+
+    ATTRS.map(a=>`<th>${a[1]}</th>`).join("")+`<th>Aktion</th></tr></thead><tbody>`+
+    ps.map(p=>`<tr><td><b>${escapeHtml(p.name)}</b><div class="muted" style="font-size:12px;">${escapeHtml(p.nation||"")} • <span class="mono">${p.dob||""}</span></div></td>
+      <td class="mono">${p.number??""}</td><td class="mono">${p.position}</td>
+      <td>${p.squadRole==="Kern"?'<span class="chip gold">Kern</span>':'<span class="chip">Joker</span>'}</td>
+      <td>${escapeHtml(p.role||"")}</td>`+
+      ATTRS.map(a=>`<td class="mono">${round1(p.attrs?.[a[0]]||0)}</td>`).join("")+
+      `<td><div class="row-actions"><button class="btn secondary" onclick="editPlayer('${p.id}')">Bearbeiten</button><button class="btn danger" onclick="deletePlayer('${p.id}')">Löschen</button></div></td></tr>`).join("")+
+    `</tbody></table>`;
+}
+function openPlayerModal(player){
+  const p = player?structuredClone(player):{id:Math.random().toString(16).slice(2)+"-"+Date.now().toString(16),name:"",number:"",dob:"",nation:"Österreich",position:"MF",squadRole:"Kern",isJoker:false,role:"",notes:"",
+    attrs:{stamina:10,pace:10,passing:10,defending:10,shooting:10,positioning:10,communication:10,fitness:10},createdAt:new Date().toISOString()};
+  const modal=el(`<div style="position:fixed; inset:0; background:rgba(0,0,0,.55); display:grid; place-items:center; padding:16px; z-index:999;">
+    <div class="card" style="max-width:920px; width:100%;">
+      <div class="controls" style="justify-content:space-between;"><h2 style="margin:0;">${player?"Spieler bearbeiten":"Neuer Spieler"}</h2><button class="btn secondary" id="close">Schließen</button></div>
+      <div class="inline" style="margin-top:10px;"><div><label>Name</label><input id="name" value="${escapeAttr(p.name)}"></div><div><label>Rückennummer</label><input id="num" type="number" value="${p.number??""}"></div></div>
+      <div class="inline"><div><label>Geburtstag</label><input id="dob" type="date" value="${p.dob||""}"></div><div><label>Nation</label><input id="nat" value="${escapeAttr(p.nation||"")}"></div></div>
+      <div class="inline"><div><label>Position</label><select id="pos">${["TW","DF","MF","ST"].map(x=>`<option ${p.position===x?"selected":""}>${x}</option>`).join("")}</select></div>
+      <div><label>Status</label><select id="sr">${["Kern","Vereinsspieler","Gelegenheitsspieler"].map(x=>`<option value="${x}" ${p.squadRole===x?"selected":""}>${x}</option>`).join("")}</select></div></div>
+      <label>Rolle (kurz)</label><input id="role" value="${escapeAttr(p.role||"")}">
+      <label>Notizen</label><textarea id="notes">${escapeHtml(p.notes||"")}</textarea>
+      <div class="sep"></div><h2 style="margin:0 0 8px;">Attribute (1–20)</h2>
+      ${ATTRS.map(([k,l])=>`<div><label>${l}</label><input id="attr_${k}" type="number" min="1" max="20" step="0.5" value="${p.attrs[k]}"></div>`).join("")}
+      <div class="sep"></div><div class="controls" style="justify-content:flex-end;"><button class="btn" id="save">Speichern</button></div>
+    </div></div>`);
+  modal.querySelector("#close").onclick=()=>modal.remove();
+  modal.querySelector("#save").onclick=()=>{
+    const name=modal.querySelector("#name").value.trim(); if(!name) return alert("Bitte Name eingeben.");
+    p.name=name; p.number=parseInt(modal.querySelector("#num").value,10)||""; p.dob=modal.querySelector("#dob").value; p.nation=modal.querySelector("#nat").value.trim();
+    p.position=modal.querySelector("#pos").value; p.squadRole=modal.querySelector("#sr").value; p.isJoker=p.squadRole!=="Kern"; p.role=modal.querySelector("#role").value.trim(); p.notes=modal.querySelector("#notes").value.trim();
+    ATTRS.forEach(([k])=>{const v=parseFloat(modal.querySelector("#attr_"+k).value); p.attrs[k]=clamp(isNaN(v)?10:v,1,20);});
+    const idx=state.players.findIndex(x=>x.id===p.id); if(idx>=0) state.players[idx]=p; else state.players.push(p);
+    saveState(); render(); modal.remove();
+  };
+  document.body.appendChild(modal);
+}
+window.editPlayer=(id)=>{const p=state.players.find(x=>x.id===id); if(p) openPlayerModal(p);};
+window.deletePlayer=(id)=>{const p=state.players.find(x=>x.id===id); if(!p) return; if(!confirm(`Spieler "${p.name}" löschen?`)) return;
+  state.players=state.players.filter(x=>x.id!==id);
+  (state.sessions||[]).forEach(s=>s.attendance=(s.attendance||[]).filter(a=>a.playerId!==id));
+  (state.matches||[]).forEach(m=>m.stats=(m.stats||[]).filter(a=>a.playerId!==id));
+  saveState(); render();
+};
+
+/* Training */
+function renderSessions(){
+  const root=el(`<div class="grid"></div>`);
+  const card=el(`<div class="card">
+    <div class="controls" style="justify-content:space-between;"><h2 style="margin:0;">Trainingseinheiten</h2><button class="btn" id="add">+ Einheit</button></div>
+    <div class="sep"></div><div class="notice">Standard-Attendance: <b>nur Kernspieler</b>. Joker kannst du optional aktivieren.</div>
+    <div class="sep"></div><div style="overflow:auto;">${renderSessionsTable()}</div>
+  </div>`);
+  card.querySelector("#add").onclick=()=>openSessionModal(null);
+  root.appendChild(card); return root;
+}
+function renderSessionsTable(){
+  const ss=[...(state.sessions||[])].sort((a,b)=>(b.date||"").localeCompare(a.date||""));
+  if(!ss.length) return `<p class="muted">Noch keine Einheiten.</p>`;
+  const coreIds=new Set(state.players.filter(p=>p.squadRole==="Kern").map(p=>p.id));
+  return `<table><thead><tr><th>Datum</th><th>Dauer</th><th>Fokus</th><th>RPE</th><th>Kern</th><th>Aktion</th></tr></thead><tbody>`+
+    ss.map(s=>{const corePresent=(s.attendance||[]).filter(a=>coreIds.has(a.playerId)&&a.present).length; const coreTotal=coreIds.size;
+      return `<tr><td class="mono">${s.date}</td><td class="mono">${s.minutes} min</td><td>${(s.focus||[]).map(f=>`<span class="chip gold">${labelAttr(f)}</span>`).join("")}</td><td><span class="pill">${s.rpe}</span></td><td class="mono">${corePresent}/${coreTotal}</td>
+      <td><div class="row-actions"><button class="btn secondary" onclick="editSession('${s.id}')">Bearbeiten</button><button class="btn danger" onclick="deleteSession('${s.id}')">Löschen</button></div></td></tr>`;
+    }).join("")+`</tbody></table>`;
+}
+function openSessionModal(session){
+  const all=state.players;
+  const s=session?structuredClone(session):{id:Math.random().toString(16).slice(2)+"-"+Date.now().toString(16),date:new Date().toISOString().slice(0,10),minutes:90,rpe:6,focus:["passing","positioning"],
+    attendance:all.map(p=>({playerId:p.id,present:(p.squadRole==="Kern")})),notes:""};
+  const modal=el(`<div style="position:fixed; inset:0; background:rgba(0,0,0,.55); display:grid; place-items:center; padding:16px; z-index:999;">
+    <div class="card" style="max-width:980px; width:100%;">
+      <div class="controls" style="justify-content:space-between;"><h2 style="margin:0;">${session?"Training bearbeiten":"Neue Trainingseinheit"}</h2><button class="btn secondary" id="close">Schließen</button></div>
+      <div class="inline" style="margin-top:10px;"><div><label>Datum</label><input id="date" type="date" value="${s.date}"></div><div><label>Dauer</label><input id="min" type="number" min="30" max="240" step="5" value="${s.minutes}"></div></div>
+      <div class="inline"><div><label>RPE (1–10)</label><input id="rpe" type="number" min="1" max="10" step="1" value="${s.rpe}"></div>
+      <div><label>Fokus-Preset</label><select id="preset"><option value="">(frei wählen)</option>${Object.keys(FOCUS_PRESETS).map(k=>`<option value="${escapeAttr(k)}">${escapeHtml(k)}</option>`).join("")}</select></div></div>
+      <label>Fokus (2–3)</label>
+      ${ATTRS.map(([k,l])=>`<div><label>${l}</label><select data-focus="${k}"><option value="no" ${s.focus.includes(k)?"":"selected"}>Nein</option><option value="yes" ${s.focus.includes(k)?"selected":""}>Ja</option></select></div>`).join("")}
+      <div class="sep"></div>
+      <div class="controls" style="justify-content:space-between;"><div><h2 style="margin:0;">Attendance</h2><div class="muted" style="font-size:12px;">Standard: Kernspieler = Ja</div></div>
+      <div class="controls"><button class="btn secondary" id="kern">Nur Kern</button><button class="btn secondary" id="all">Alle</button><button class="btn secondary" id="none">Keine</button></div></div>
+      <div class="sep"></div>
+      <div style="max-height:320px; overflow:auto;"><table><thead><tr><th>Spieler</th><th>Status</th><th>Anwesend</th></tr></thead><tbody>
+      ${all.slice().sort((a,b)=>a.name.localeCompare(b.name)).map(p=>{const a=(s.attendance||[]).find(x=>x.playerId===p.id)||{present:false};
+        return `<tr><td><b>${p.name}</b> <span class="pill">#${p.number??""}</span></td><td>${p.squadRole==="Kern"?'<span class="chip gold">Kern</span>':'<span class="chip">Joker</span>'}</td>
+        <td><select data-att="${p.id}"><option value="yes" ${a.present?"selected":""}>Ja</option><option value="no" ${a.present?"":"selected"}>Nein</option></select></td></tr>`;
+      }).join("")}
+      </tbody></table></div>
+      <label>Notizen</label><textarea id="notes">${escapeHtml(s.notes||"")}</textarea>
+      <div class="sep"></div><div class="controls" style="justify-content:flex-end;"><button class="btn" id="save">Speichern & Progress</button></div>
+    </div></div>`);
+  modal.querySelector("#close").onclick=()=>modal.remove();
+  modal.querySelector("#preset").onchange=(e)=>{const k=e.target.value; if(!k) return; const preset=FOCUS_PRESETS[k];
+    modal.querySelectorAll("[data-focus]").forEach(sel=>{const a=sel.getAttribute("data-focus"); sel.value=preset.includes(a)?"yes":"no";});
+  };
+  function setAtt(mode){modal.querySelectorAll("[data-att]").forEach(sel=>{const pid=sel.getAttribute("data-att"); const p=state.players.find(x=>x.id===pid);
+    if(mode==="kern") sel.value=(p&&p.squadRole==="Kern")?"yes":"no"; if(mode==="all") sel.value="yes"; if(mode==="none") sel.value="no";
+  });}
+  modal.querySelector("#kern").onclick=()=>setAtt("kern");
+  modal.querySelector("#all").onclick=()=>setAtt("all");
+  modal.querySelector("#none").onclick=()=>setAtt("none");
+  modal.querySelector("#save").onclick=()=>{
+    s.date=modal.querySelector("#date").value; s.minutes=parseInt(modal.querySelector("#min").value,10)||90; s.rpe=clamp(parseInt(modal.querySelector("#rpe").value,10)||6,1,10);
+    s.notes=modal.querySelector("#notes").value.trim();
+    const focus=[]; modal.querySelectorAll("[data-focus]").forEach(sel=>{if(sel.value==="yes") focus.push(sel.getAttribute("data-focus"));}); s.focus=focus.slice(0,3);
+    s.attendance=[]; modal.querySelectorAll("[data-att]").forEach(sel=>{s.attendance.push({playerId:sel.getAttribute("data-att"),present:sel.value==="yes"});});
+    const idx=state.sessions.findIndex(x=>x.id===s.id); const isEdit=idx>=0;
+    if(isEdit){const proceed=confirm("Bearbeitung: Progress erneut anwenden? (OK=ja, Abbrechen=nur speichern)"); state.sessions[idx]=s; if(proceed) applyProgress(s);}
+    else{state.sessions.push(s); applyProgress(s);}
+    saveState(); render(); modal.remove();
+  };
+  document.body.appendChild(modal);
+}
+function applyProgress(s){
+  const present=new Set((s.attendance||[]).filter(a=>a.present).map(a=>a.playerId));
+  const base=state.settings.baseGain; const rpe=(s.rpe||6)*state.settings.rpeMultiplier; const maxG=state.settings.maxGain; const minG=state.settings.minGain;
+  (state.players||[]).forEach(p=>{
+    if(!present.has(p.id)) return;
+    (s.focus||[]).forEach(k=>{const g=clamp(base+rpe,minG,maxG); p.attrs[k]=round1(clamp((p.attrs[k]||10)+g,1,20));});
+    const fg=clamp((base/2)+(rpe/2),minG,maxG/2); p.attrs.fitness=round1(clamp((p.attrs.fitness||10)+fg,1,20));
+    if((s.minutes||90)>=80) p.attrs.stamina=round1(clamp((p.attrs.stamina||10)+clamp(0.10+(rpe/4),0.05,0.25),1,20));
+    // Save history snapshot (development curves)
+    p.history = p.history || [];
+    p.history.push({date:s.date, attrs:structuredClone(p.attrs)});
+    // keep last 120 snapshots
+    if(p.history.length>120) p.history=p.history.slice(p.history.length-120);
+
+  });
+}
+window.editSession=(id)=>{const s=state.sessions.find(x=>x.id===id); if(s) openSessionModal(s);};
+window.deleteSession=(id)=>{const s=state.sessions.find(x=>x.id===id); if(!s) return; if(!confirm(`Training am ${s.date} löschen?`)) return; state.sessions=state.sessions.filter(x=>x.id!==id); saveState(); render();};
+/* Matchplanner */
+function formationSlots(fmt, formation){
+  // Returns ordered slots for lineup (pos label + default role hint)
+  // 5+1 -> 6 players, 6+1 -> 7 players
+  const f = formation || (fmt==="6+1"?"3-2-1":"2-2-1");
+  const slots=[];
+  slots.push({key:"GK", label:"TW", hint:"GK (Build-up)"});
+  const add=(k,l,h)=>slots.push({key:k,label:l,hint:h||""});
+  if(fmt==="5+1"){
+    if(f==="2-2-1"){
+      add("D1","DF-L","Safe DF"); add("D2","DF-R","Ball-Playing");
+      add("M1","MF-L","Runner"); add("M2","MF-R","Playmaker");
+      add("S1","ST","Target/Link");
+    } else if(f==="1-2-2"){
+      add("D1","DF","Anchor"); 
+      add("M1","MF-L","Runner"); add("M2","MF-R","Playmaker");
+      add("S1","ST-L","Runner"); add("S2","ST-R","Finisher");
+    } else { // 2-1-2
+      add("D1","DF-L","Safe DF"); add("D2","DF-R","Ball-Playing");
+      add("M1","MF","Anchor/Playmaker");
+      add("S1","ST-L","Runner"); add("S2","ST-R","Finisher");
+    }
+  } else { // 6+1
+    if(f==="3-2-1"){
+      add("D1","DF-L","Safe DF"); add("D2","DF-C","Anchor"); add("D3","DF-R","Ball-Playing");
+      add("M1","MF-L","Runner"); add("M2","MF-R","Playmaker");
+      add("S1","ST","Target/Link");
+    } else { // 2-3-1
+      add("D1","DF-L","Safe DF"); add("D2","DF-R","Ball-Playing");
+      add("M1","MF-L","Runner"); add("M2","MF-C","Anchor"); add("M3","MF-R","Playmaker");
+      add("S1","ST","Target/Link");
+    }
+  }
+  return slots;
+}
+
+function renderPlanner(){
+  const root=el(`<div class="grid"></div>`);
+  const games=upcomingGames();
+  const defaultGame = games[0] || (state.schedule||[])[0] || {date:"",time:"",opponent:"",home:true,location:""};
+  state.matchPlans = state.matchPlans || [];
+  // match by date+time
+  const existing = state.matchPlans.find(p=>p.game?.date===defaultGame.date && p.game?.time===defaultGame.time) || null;
+
+  const card=el(`<div class="card">
+    <div class="controls" style="justify-content:space-between;">
+      <h2 style="margin:0;">Matchplanner (WhatsApp-ready)</h2>
+      <div class="controls">
+        <button class="btn secondary" id="copyPlan">WhatsApp: Matchplan</button>
+        <button class="btn secondary" id="copyPoll">WhatsApp: Verfügbarkeit-Umfrage</button>
+        <button class="btn" id="savePlan">Speichern</button>
+      </div>
+    </div>
+    <div class="sep"></div>
+
+    <div class="row two">
+      <div>
+        <h2>Kommendes Spiel</h2>
+        <label>Spiel auswählen</label>
+        <select id="gamePick">
+          ${(games.length?games:state.schedule||[]).map((g,i)=>{
+            const txt = `${g.date} ${g.time} – ${g.home?"BU vs. "+g.opponent:g.opponent+" vs. BU"} (${g.location||""})`;
+            return `<option value="${i}">${escapeHtml(txt)}</option>`;
+          }).join("")}
+        </select>
+
+        <div class="inline" style="margin-top:10px;">
+          <div>
+            <label>Format</label>
+            <select id="format">
+              <option value="5+1">5+1</option>
+              <option value="6+1">6+1</option>
+            </select>
+          </div>
+          <div>
+            <label>Formation</label>
+            <select id="formation">
+              <option value="2-2-1">2-2-1 (safe)</option>
+              <option value="1-2-2">1-2-2 (mehr Ball)</option>
+              <option value="2-1-2">2-1-2 (direkter)</option>
+              <option value="3-2-1">3-2-1 (6+1 stabil)</option>
+              <option value="2-3-1">2-3-1 (6+1 Kontrolle)</option>
+            </select>
+          </div>
+        </div>
+
+        <label>Treffpunkt (Minuten vor Anstoß)</label>
+        <input id="meet" type="number" min="15" max="90" step="5" value="45"/>
+
+        <label>Key Regeln (jede Zeile 1)</label>
+        <textarea id="rules" placeholder="jede Zeile eine Regel"></textarea>
+
+        <label>Coach Notes (optional)</label>
+        <textarea id="notes" placeholder="z.B. kompakt bleiben, kurze Pässe, kein Risiko hinten"></textarea>
+
+        <div class="sep"></div>
+        <h2>Matchday Checkliste</h2>
+        <div class="notice small" id="check"></div>
+        <div class="controls" style="margin-top:10px;">
+          <button class="btn secondary" id="copyCheck">WhatsApp: Checkliste</button>
+        </div>
+
+        <div class="sep"></div>
+        <h2>Verfügbarkeit</h2>
+        <div class="notice small">Kernspieler = standardmäßig ✅ „Dabei“, Joker = ⏳ „Vielleicht“ (du kannst alles umstellen). Speichern nicht vergessen.</div>
+        <div style="max-height:260px; overflow:auto;">
+          <table>
+            <thead><tr><th>Spieler</th><th>Status</th><th>Verfügbar</th></tr></thead>
+            <tbody id="availRows"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div>
+        <h2>Aufstellung</h2>
+        <div class="notice small">Drag & Drop: Zieh Spieler in Slots. Doppelklick entfernt. Rollen sind optional.</div>
+
+        <div class="slotGrid">
+          <div class="pitch">
+            <div class="controls" style="justify-content:space-between;">
+              <div class="muted small" id="slotInfo"></div>
+              <div class="controls">
+                <button class="btn secondary" id="auto">Auto</button>
+                <button class="btn secondary" id="clear">Clear</button>
+              </div>
+            </div>
+            <div id="slots"></div>
+            <div class="sep"></div>
+            <h2>Bank</h2>
+            <div id="bench" class="muted small"></div>
+          </div>
+
+          <div class="pitch">
+            <h2>Spieler-Pool</h2>
+            <div class="muted small">Tipp: Nutze Verfügbarkeit links. Pool zeigt alle, aber du kannst nur so viele in Slots legen wie das Format erlaubt.</div>
+            <label>Filter</label>
+            <select id="poolMode">
+              <option value="all">Alle</option>
+              <option value="core">Nur Kern</option>
+              <option value="availableOnly">Nur ✅ dabei</option>
+            </select>
+            <div class="sep"></div>
+            <div id="pool"></div>
+          </div>
+        </div>
+
+        <div class="sep"></div>
+        <div class="notice small">WhatsApp Matchplan enthält: Spielinfo + Treffpunkt + Aufstellung + Bank + Regeln + Notes.</div>
+      </div>
+    </div>
+  </div>`);
+  root.appendChild(card);
+
+  const plan = structuredClone(existing || {
+    id:"mp_"+Math.random().toString(16).slice(2),
+    game: structuredClone(defaultGame),
+    format:"5+1",
+    formation:"2-2-1",
+    meetMins:45,
+    keyRules:["Ball > Gegner","Kein Dribbling hinten","Nach Ballverlust 3 Sek. Druck","Reden!"],
+    notes:"",
+    lineup:[], // {slotKey, playerId, name, role}
+    bench:[],
+    availability:{} // playerId -> "yes" | "maybe" | "no"
+  });
+
+  function setDefaultsAvailability(){
+    const avail=plan.availability || {};
+    (state.players||[]).forEach(p=>{
+      if(avail[p.id]) return;
+      avail[p.id] = (p.squadRole==="Kern") ? "yes" : "maybe";
+    });
+    plan.availability = avail;
+  }
+
+  function listGames(){
+    return (games.length?games:state.schedule||[]);
+  }
+
+  function currentGame(){
+    const list=listGames();
+    const i=parseInt(card.querySelector("#gamePick").value,10)||0;
+    return structuredClone(list[i]||defaultGame);
+  }
+
+  function ensureRules(){
+    const ta=card.querySelector("#rules");
+    if(!ta.value.trim()){
+      ta.value = (plan.keyRules||[]).join("\n");
+    }
+  }
+
+  function checklistText(){
+    const g=plan.game;
+    const lines=[];
+    lines.push(`✅ *MATCHDAY CHECKLISTE*`);
+    lines.push(`📍 Ort: ${g.location||""}`);
+    lines.push(`⏰ Treffpunkt: ${plan.meetMins||45} min vor Anstoß`);
+    lines.push(`🪪 Ausweis + 🟨🖤 Trikot`);
+    lines.push(`💧 Wasser / Iso`);
+    lines.push(`🩹 Schienbeinschoner / Tape`);
+    lines.push(`🧤 (bei Kälte) Handschuhe/Mütze`);
+    lines.push(`📣 Kommunikation & Rollen vor Anstoß klären`);
+    lines.push(`🧠 Fokus: kompakt + kurze Pässe + wenig Risiko hinten`);
+    return lines.join("\n");
+  }
+
+  function renderChecklist(){ card.querySelector("#check").innerText = checklistText(); }
+
+  function renderAvailability(){
+    setDefaultsAvailability();
+    const body=card.querySelector("#availRows");
+    const ps=(state.players||[]).slice().sort((a,b)=>a.name.localeCompare(b.name));
+    body.innerHTML = ps.map(p=>{
+      const v=plan.availability[p.id] || "maybe";
+      return `<tr>
+        <td><b>${escapeHtml(p.name)}</b> <span class="pill">#${p.number??""}</span></td>
+        <td>${p.squadRole==="Kern"?'<span class="chip gold">Kern</span>':'<span class="chip">Joker</span>'}</td>
+        <td>
+          <select data-av="${p.id}">
+            <option value="yes" ${v==="yes"?"selected":""}>✅ dabei</option>
+            <option value="maybe" ${v==="maybe"?"selected":""}>⏳ vielleicht</option>
+            <option value="no" ${v==="no"?"selected":""}>❌ nein</option>
+          </select>
+        </td>
+      </tr>`;
+    }).join("");
+    body.querySelectorAll("[data-av]").forEach(sel=>{
+      sel.onchange=()=>{ plan.availability[sel.getAttribute("data-av")] = sel.value; renderPool(); renderBench(); };
+    });
+  }
+
+  function poolPlayers(){
+    const mode=card.querySelector("#poolMode").value;
+    const ps=(state.players||[]);
+    if(mode==="core") return ps.filter(p=>p.squadRole==="Kern");
+    if(mode==="availableOnly") return ps.filter(p=> (plan.availability[p.id]||"maybe")==="yes");
+    return ps;
+  }
+
+  function slotsList(){
+    const fmt=card.querySelector("#format").value;
+    const formation=card.querySelector("#formation").value;
+    return formationSlots(fmt, formation);
+  }
+
+  function slotAssigned(slotKey){
+    return plan.lineup.find(x=>x.slotKey===slotKey) || null;
+  }
+  function playerAssigned(pid){
+    return plan.lineup.find(x=>x.playerId===pid) || null;
+  }
+
+  function renderSlots(){
+    const slots=slotsList();
+    const box=card.querySelector("#slots");
+    card.querySelector("#slotInfo").innerText = `Slots: ${slots.length} (${card.querySelector("#format").value} / ${card.querySelector("#formation").value})`;
+    box.innerHTML = slots.map(s=>{
+      const a=slotAssigned(s.key);
+      const name=a?escapeHtml(a.name):"<span class='muted'>Spieler ziehen…</span>";
+      const role=a?.role || s.hint || "";
+      return `<div class="slot" data-slot="${s.key}">
+        <div>
+          <strong>${escapeHtml(s.label)}</strong>
+          <div class="muted small">${role?escapeHtml(role):" "}</div>
+        </div>
+        <div style="min-width:250px;">
+          <div class="muted small">${name}</div>
+          <input class="small" data-role="${s.key}" placeholder="Rolle (optional)" value="${escapeAttr(a?.role||"")}" />
+        </div>
+      </div>`;
+    }).join("");
+
+    // drop handlers
+    box.querySelectorAll("[data-slot]").forEach(slot=>{
+      slot.ondragover=(e)=>{ e.preventDefault(); };
+      slot.ondrop=(e)=>{
+        e.preventDefault();
+        const pid=e.dataTransfer.getData("text/playerId");
+        if(!pid) return;
+        assignToSlot(pid, slot.getAttribute("data-slot"));
+      };
+      slot.ondblclick=()=>{
+        const key=slot.getAttribute("data-slot");
+        plan.lineup = plan.lineup.filter(x=>x.slotKey!==key);
+        renderSlots(); renderBench(); renderPool();
+      };
+    });
+
+    // role inputs
+    box.querySelectorAll("[data-role]").forEach(inp=>{
+      inp.oninput=()=>{
+        const slotKey=inp.getAttribute("data-role");
+        const a=slotAssigned(slotKey);
+        if(a) a.role=inp.value.trim();
+      };
+    });
+  }
+
+  function renderBench(){
+    const pool=poolPlayers();
+    const selectedIds=new Set(plan.lineup.map(x=>x.playerId));
+    const bench = pool.filter(p=>!selectedIds.has(p.id)).map(p=>p.name);
+    plan.bench = bench.map(n=>({name:n}));
+    card.querySelector("#bench").innerText = bench.length ? bench.join(", ") : "—";
+  }
+
+  function renderPool(){
+    const pool=poolPlayers().slice().sort((a,b)=>{
+      // yes first, then maybe, then no
+      const score=(p)=>({yes:0,maybe:1,no:2}[plan.availability[p.id]||"maybe"]);
+      const s = score(a)-score(b);
+      if(s!==0) return s;
+      const ar=a.squadRole==="Kern"?0:1, br=b.squadRole==="Kern"?0:1;
+      if(ar!==br) return ar-br;
+      const pr={"TW":0,"DF":1,"MF":2,"ST":3}; 
+      return (pr[a.position]??9)-(pr[b.position]??9);
+    });
+    const box=card.querySelector("#pool");
+    const selectedIds=new Set(plan.lineup.map(x=>x.playerId));
+    box.innerHTML = pool.map(p=>{
+      const v=plan.availability[p.id]||"maybe";
+      const badge = v==="yes"?"✅":(v==="no"?"❌":"⏳");
+      const assigned = selectedIds.has(p.id);
+      return `<div class="draggable" draggable="${assigned?"false":"true"}" data-player="${p.id}" style="opacity:${assigned?0.45:1}">
+        <div class="controls" style="justify-content:space-between;">
+          <div><b>${badge} ${escapeHtml(p.name)}</b> <span class="pill">#${p.number??""}</span></div>
+          <div class="kv">
+            ${p.squadRole==="Kern"?'<span class="chip gold">Kern</span>':'<span class="chip">Joker</span>'}
+            <span class="chip">${escapeHtml(p.position)}</span>
+          </div>
+        </div>
+        <div class="muted small">${escapeHtml(p.role||"")}</div>
+      </div>`;
+    }).join("");
+
+    box.querySelectorAll("[data-player]").forEach(div=>{
+      const pid=div.getAttribute("data-player");
+      div.ondragstart=(e)=>{ e.dataTransfer.setData("text/playerId", pid); };
+      div.ondblclick=()=>{
+        // quick assign to first free slot
+        const slots=slotsList();
+        const free=slots.find(s=>!slotAssigned(s.key));
+        if(!free) return alert("Keine freien Slots. Entferne zuerst jemanden (Doppelklick auf Slot).");
+        assignToSlot(pid, free.key);
+      };
+    });
+  }
+
+  function assignToSlot(playerId, slotKey){
+    // availability filter: allow but warn if ❌
+    if((plan.availability[playerId]||"maybe")==="no"){
+      if(!confirm("Spieler ist auf ❌ 'nein'. Trotzdem in Aufstellung?")) return;
+    }
+    // remove from other slot if assigned
+    plan.lineup = plan.lineup.filter(x=>x.playerId!==playerId);
+    // replace slot occupant
+    plan.lineup = plan.lineup.filter(x=>x.slotKey!==slotKey);
+    const p=state.players.find(x=>x.id===playerId);
+    plan.lineup.push({slotKey, playerId, name:p?.name||"Spieler", role:""});
+    renderSlots(); renderBench(); renderPool();
+  }
+
+  function autoLineup(){
+    plan.lineup=[];
+    const slots=slotsList();
+    const pool = poolPlayers().filter(p=>(plan.availability[p.id]||"maybe")!=="no");
+    // prioritize Kern + positions
+    const sorted = pool.slice().sort((a,b)=>{
+      const ar=a.squadRole==="Kern"?0:1, br=b.squadRole==="Kern"?0:1;
+      if(ar!==br) return ar-br;
+      const pr={"TW":0,"DF":1,"MF":2,"ST":3}; 
+      return (pr[a.position]??9)-(pr[b.position]??9);
+    });
+    // slot by desired position (label contains)
+    function pick(pos){
+      const idx=sorted.findIndex(p=>p.position===pos && !playerAssigned(p.id));
+      if(idx>=0){ const p=sorted[idx]; return p; }
+      // fallback any
+      const j=sorted.findIndex(p=>!playerAssigned(p.id));
+      return j>=0 ? sorted[j] : null;
+    }
+    slots.forEach(s=>{
+      let want="MF";
+      if(s.label.startsWith("TW")) want="TW";
+      else if(s.label.startsWith("DF")) want="DF";
+      else if(s.label.startsWith("ST")) want="ST";
+      const p=pick(want);
+      if(p) plan.lineup.push({slotKey:s.key, playerId:p.id, name:p.name, role:s.hint||""});
+    });
+    renderSlots(); renderBench(); renderPool();
+  }
+
+  function syncFromUI(){
+    plan.game=currentGame();
+    plan.format=card.querySelector("#format").value;
+    plan.formation=card.querySelector("#formation").value;
+    plan.meetMins=parseInt(card.querySelector("#meet").value,10)||45;
+    plan.keyRules=card.querySelector("#rules").value.split("\n").map(x=>x.trim()).filter(Boolean).slice(0,8);
+    plan.notes=card.querySelector("#notes").value.trim();
+    // pull roles from slot inputs
+    card.querySelectorAll("[data-role]").forEach(inp=>{
+      const slotKey=inp.getAttribute("data-role");
+      const a=slotAssigned(slotKey);
+      if(a) a.role=inp.value.trim();
+    });
+    // bench refreshed
+    renderBench();
+  }
+
+  function savePlan(){
+    syncFromUI();
+    state.matchPlans = state.matchPlans || [];
+    const idx=state.matchPlans.findIndex(p=>p.id===plan.id);
+    if(idx>=0) state.matchPlans[idx]=structuredClone(plan);
+    else state.matchPlans.push(structuredClone(plan));
+    saveState();
+  }
+
+  function buildPollText(){
+    const g=plan.game;
+    const lines=[];
+    lines.push(`🟨🖤 *Ballers United – Verfügbarkeit*`);
+    lines.push(`📅 ${g.date} • ${g.time} • 📍 ${g.location||""}`);
+    lines.push(`🆚 ${g.home?`Ballers United vs. ${g.opponent}`:`${g.opponent} vs. Ballers United`}`);
+    lines.push("");
+    lines.push(`Bitte reagieren: ✅ dabei / ⏳ vielleicht / ❌ nein`);
+    return lines.join("\n");
+  }
+
+  // init
+  setDefaultsAvailability();
+  ensureRules();
+  card.querySelector("#format").value=plan.format;
+  card.querySelector("#formation").value=plan.formation;
+  card.querySelector("#meet").value=plan.meetMins;
+  card.querySelector("#notes").value=plan.notes||"";
+  renderChecklist();
+  renderAvailability();
+  renderSlots();
+  renderBench();
+  renderPool();
+
+  // UI events
+  card.querySelector("#gamePick").onchange=()=>{ plan.game=currentGame(); renderChecklist(); };
+  card.querySelector("#meet").oninput=()=>{ plan.meetMins=parseInt(card.querySelector("#meet").value,10)||45; renderChecklist(); };
+  card.querySelector("#format").onchange=()=>{ plan.format=card.querySelector("#format").value; renderSlots(); renderBench(); renderPool(); };
+  card.querySelector("#formation").onchange=()=>{ plan.formation=card.querySelector("#formation").value; renderSlots(); };
+  card.querySelector("#poolMode").onchange=()=>{ renderPool(); renderBench(); };
+
+  card.querySelector("#auto").onclick=autoLineup;
+  card.querySelector("#clear").onclick=()=>{ plan.lineup=[]; renderSlots(); renderBench(); renderPool(); };
+
+  card.querySelector("#savePlan").onclick=()=>{ savePlan(); alert("Matchplan gespeichert ✅"); };
+  card.querySelector("#copyPlan").onclick=()=>{ savePlan(); 
+    const slots=slotsList();
+    // format lineup into WhatsApp lines using slot order
+    const lineup = slots.map(s=>{
+      const a=slotAssigned(s.key);
+      return a ? {pos:s.label, name:a.name, role:a.role||s.hint||""} : null;
+    }).filter(Boolean);
+    const out={...plan, lineup};
+    const txt=formatLineupWhatsApp(out);
+    copyText(txt);
+  };
+  card.querySelector("#copyCheck").onclick=()=>{ savePlan(); copyText(checklistText()); };
+  card.querySelector("#copyPoll").onclick=()=>{ savePlan(); copyText(buildPollText()); };
+
+  return root;
+}
+
+
+
+/* Matches */
+function renderMatches(){
+  const root=el(`<div class="grid"></div>`);
+  const card=el(`<div class="card"><div class="controls" style="justify-content:space-between;"><h2 style="margin:0;">Matches (Coach Stats)</h2><button class="btn" id="add">+ Match</button></div>
+  <div class="sep"></div><div style="overflow:auto;">${renderMatchesTable()}</div></div>`);
+  card.querySelector("#add").onclick=()=>openMatchModal(null); root.appendChild(card); return root;
+}
+function renderMatchesTable(){
+  const ms=[...(state.matches||[])].sort((a,b)=>(b.date||"").localeCompare(a.date||""));
+  if(!ms.length) return `<p class="muted">Noch keine Matches.</p>`;
+  return `<table><thead><tr><th>Datum</th><th>Gegner</th><th>Ergebnis</th><th>Notizen</th><th>Aktion</th></tr></thead><tbody>`+
+    ms.map(m=>`<tr><td class="mono">${m.date}</td><td><b>${escapeHtml(m.opponent||"-")}</b></td><td class="mono">${escapeHtml(m.score||"-")}</td><td class="muted" style="font-size:12px;">${escapeHtml(m.notes||"")}</td>
+    <td><div class="row-actions"><button class="btn secondary" onclick="editMatch('${m.id}')">Bearbeiten</button><button class="btn danger" onclick="deleteMatch('${m.id}')">Löschen</button></div></td></tr>`).join("")+
+    `</tbody></table>`;
+}
+function openMatchModal(match){
+  const m=match?structuredClone(match):{id:Math.random().toString(16).slice(2)+"-"+Date.now().toString(16),date:new Date().toISOString().slice(0,10),opponent:"",score:"",notes:"",
+    stats:state.players.map(p=>({playerId:p.id,available:(p.squadRole==="Kern"),minutes:0,goals:0,assists:0,rating:6,yellow:0,red:0,feedback:""})), teamFeedback:""};
+  const modal=el(`<div style="position:fixed; inset:0; background:rgba(0,0,0,.55); display:grid; place-items:center; padding:16px; z-index:999;">
+    <div class="card" style="max-width:1020px; width:100%;">
+      <div class="controls" style="justify-content:space-between;"><h2 style="margin:0;">${match?"Match bearbeiten":"Neues Match"}</h2><button class="btn secondary" id="close">Schließen</button></div>
+      <div class="inline" style="margin-top:10px;"><div><label>Datum</label><input id="date" type="date" value="${m.date}"></div><div><label>Gegner</label><input id="opp" value="${escapeAttr(m.opponent||"")}"></div></div>
+      <div class="inline"><div><label>Ergebnis</label><input id="score" value="${escapeAttr(m.score||"")}" placeholder="z.B. 3:2"></div><div><label>Notizen</label><input id="notes" value="${escapeAttr(m.notes||"")}"></div></div>
+      <div class="sep"></div>
+      <div class="controls" style="justify-content:space-between;"><div><h2 style="margin:0;">Spieler-Stats</h2><div class="muted" style="font-size:12px;">Setze Verfügbarkeit (Joker meist nur bei Matches).</div></div>
+      <div class="controls"><button class="btn secondary" id="core">Kern verfügbar</button><button class="btn secondary" id="all">Alle verfügbar</button><button class="btn secondary" id="none">Alle nicht</button></div></div>
+      <div class="sep"></div>
+      <div style="max-height:340px; overflow:auto;">
+        <table><thead><tr><th>Spieler</th><th>Status</th><th>Verfügbar</th><th>Min</th><th>G</th><th>A</th><th>Rating</th><th>Gelb</th><th>Rot</th><th>Feedback</th></tr></thead><tbody>
+        ${state.players.slice().sort((a,b)=>a.name.localeCompare(b.name)).map(p=>{const s=(m.stats||[]).find(x=>x.playerId===p.id)||{available:false,minutes:0,goals:0,assists:0,rating:6,yellow:0,red:0};
+          return `<tr><td><b>${p.name}</b> <span class="pill">#${p.number??""}</span></td><td>${p.squadRole==="Kern"?'<span class="chip gold">Kern</span>':'<span class="chip">Joker</span>'}</td>
+          <td><select data-av="${p.id}"><option value="yes" ${s.available?"selected":""}>Ja</option><option value="no" ${s.available?"":"selected"}>Nein</option></select></td>
+          <td><input data-num="min" data-p="${p.id}" type="number" min="0" max="200" step="5" value="${s.minutes}" style="width:84px"></td>
+          <td><input data-num="g" data-p="${p.id}" type="number" min="0" max="20" step="1" value="${s.goals}" style="width:70px"></td>
+          <td><input data-num="a" data-p="${p.id}" type="number" min="0" max="20" step="1" value="${s.assists}" style="width:70px"></td>
+          <td><input data-num="r" data-p="${p.id}" type="number" min="1" max="10" step="0.5" value="${s.rating}" style="width:80px"></td>
+          <td><input data-num="y" data-p="${p.id}" type="number" min="0" max="2" step="1" value="${s.yellow}" style="width:70px"></td>
+          <td><input data-num="red" data-p="${p.id}" type="number" min="0" max="1" step="1" value="${s.red}" style="width:70px"></td><td><input data-fb="${p.id}" value="${escapeAttr(s.feedback||"")}" placeholder="kurz: 1 Satz" style="min-width:220px"></td></tr>`;
+        }).join("")}
+        </tbody></table>
+      </div>
+      <div class="sep"></div><div class="controls" style="justify-content:flex-end;"><button class="btn" id="save">Speichern</button></div>
+    </div></div>`);
+  modal.querySelector("#close").onclick=()=>modal.remove();
+  function setAvail(mode){modal.querySelectorAll("[data-av]").forEach(sel=>{const pid=sel.getAttribute("data-av"); const p=state.players.find(x=>x.id===pid);
+    if(mode==="core") sel.value=(p&&p.squadRole==="Kern")?"yes":"no"; if(mode==="all") sel.value="yes"; if(mode==="none") sel.value="no";
+  });}
+  modal.querySelector("#core").onclick=()=>setAvail("core");
+  modal.querySelector("#all").onclick=()=>setAvail("all");
+  modal.querySelector("#none").onclick=()=>setAvail("none");
+  modal.querySelector("#copyFb").onclick=()=>{
+    // Build WhatsApp feedback text (only players with feedback)
+    const lines=[];
+    lines.push(`🟨🖤 *Ballers United – Match Feedback*`);
+    const opp=modal.querySelector("#opp").value.trim()||"Gegner";
+    const score=modal.querySelector("#score").value.trim()||"";
+    lines.push(`🆚 ${opp}${score?` • ${score}`:""}`);
+    const team=(modal.querySelector("#teamFb")?.value||"").trim();
+    if(team) { lines.push(`
+*Team:* ${team}`); }
+    const items=[];
+    state.players.slice().sort((a,b)=>a.name.localeCompare(b.name)).forEach(p=>{
+      const fb = (modal.querySelector(`[data-fb="${p.id}"]`)?.value||"").trim();
+      if(fb) items.push(`• *${p.name}:* ${fb}`);
+    });
+    if(items.length){ lines.push(`
+*Spieler:*`); lines.push(...items); }
+    copyText(lines.join("
+"));
+  };
+
+  modal.querySelector("#save").onclick=()=>{
+    m.date=modal.querySelector("#date").value; m.opponent=modal.querySelector("#opp").value.trim(); m.score=modal.querySelector("#score").value.trim(); m.notes=modal.querySelector("#notes").value.trim();
+    m.teamFeedback = (modal.querySelector("#teamFb")?.value||"").trim();
+    const stats=[]; state.players.forEach(p=>{
+      const available=modal.querySelector(`[data-av="${p.id}"]`).value==="yes";
+      function getNum(key,f){const inp=modal.querySelector(`[data-num="${key}"][data-p="${p.id}"]`); const v=inp?parseFloat(inp.value):NaN; return isNaN(v)?f:v;}
+      const fbInp=modal.querySelector(`[data-fb="${p.id}"]`);
+      const feedback = fbInp ? fbInp.value.trim() : "";
+      stats.push({playerId:p.id,available,minutes:getNum("min",0),goals:getNum("g",0),assists:getNum("a",0),rating:getNum("r",6),yellow:getNum("y",0),red:getNum("red",0),feedback});
+    });
+    m.stats=stats;
+    const idx=state.matches.findIndex(x=>x.id===m.id); if(idx>=0) state.matches[idx]=m; else state.matches.push(m);
+    saveState(); render(); modal.remove();
+  };
+  document.body.appendChild(modal);
+}
+window.editMatch=(id)=>{const m=state.matches.find(x=>x.id===id); if(m) openMatchModal(m);};
+window.deleteMatch=(id)=>{if(!confirm("Match löschen?")) return; state.matches=state.matches.filter(x=>x.id!==id); saveState(); render();};
+
+
+function buildTeamHistory(filterFn){
+  // Aggregate snapshots by date (average across players that have snapshot on that date)
+  const map = new Map(); // date -> {sum:{k}, n}
+  (state.players||[]).forEach(p=>{
+    if(filterFn && !filterFn(p)) return;
+    (p.history||[]).forEach(h=>{
+      const date=h.date||"";
+      if(!date) return;
+      if(!map.has(date)) map.set(date,{sum:{}, n:0});
+      const entry=map.get(date);
+      ATTRS.forEach(([k])=>{
+        entry.sum[k]=(entry.sum[k]||0)+(h.attrs?.[k]??0);
+      });
+      entry.n += 1;
+    });
+  });
+  const dates=[...map.keys()].sort();
+  return dates.map(d=>{
+    const e=map.get(d);
+    const attrs={};
+    ATTRS.forEach(([k])=>{
+      attrs[k]= e.n ? (e.sum[k]/e.n) : 0;
+    });
+    return {date:d, attrs};
+  });
+}
+
+function upcomingGames(){
+  const now=new Date();
+  return (state.schedule||[])
+    .map(g=>({...g,dt:new Date(g.date+"T"+(g.time||"00:00")+":00")}))
+    .sort((a,b)=>a.dt-b.dt)
+    .filter(g=>g.dt>=new Date(now.getTime()-86400000));
+}
+
+function formatLineupWhatsApp(plan){
+  const g=plan.game;
+  const lines=[];
+  lines.push(`🟨🖤 *BALLERS UNITED – MATCHPLAN*`);
+  lines.push(`📅 ${g.date} • ${g.time} • 📍 ${g.location||""}`);
+  lines.push(`🆚 ${g.home?`Ballers United vs. ${g.opponent}`:`${g.opponent} vs. Ballers United`}`);
+  lines.push("");
+  lines.push(`⏰ *Treffpunkt:* ${plan.meetMins||45} min vor Anstoß`);
+  lines.push(`🎒 *Mitbringen:* Trikot + Ausweis (+ Wasser)`);
+  lines.push("");
+  lines.push(`📌 *Aufstellung (${plan.format||"5+1"} / ${plan.formation||"2-2-1"}):*`);
+  (plan.lineup||[]).forEach(p=>{
+    lines.push(`• ${p.pos} – ${p.name}${p.role?` (${p.role})`:""}`);
+  });
+  if(plan.bench?.length){
+    lines.push(`\n🔁 *Bank/Wechsel:* ${plan.bench.map(x=>x.name).join(", ")}`);
+  }
+  if(plan.keyRules?.length){
+    lines.push(`\n✅ *Fokus/Regeln:*`);
+    plan.keyRules.forEach(r=>lines.push(`• ${r}`));
+  }
+  if(plan.notes){
+    lines.push(`\n📝 *Coach Notes:* ${plan.notes}`);
+  }
+  return lines.join("\n");
+}
+
+function copyText(txt){
+  return navigator.clipboard?.writeText(txt).then(()=>alert("In die Zwischenablage kopiert ✅")).catch(()=>prompt("Kopieren:", txt));
+}
+
+
+/* Trainingsbibliothek */
+function renderLibrary(){
+  const root=el(`<div class="grid"></div>`);
+  const card=el(`<div class="card">
+    <div class="controls" style="justify-content:space-between;">
+      <h2 style="margin:0;">Trainingsbibliothek</h2>
+      <div class="controls">
+        <button class="btn secondary" id="newPlan">+ Plan</button>
+        <button class="btn" id="newDrill">+ Übung</button>
+      </div>
+    </div>
+    <div class="sep"></div>
+    <div class="notice">Ziel: schnelle Coach-Vorbereitung. Wähle Übungen → erstelle Plan → copy/paste in WhatsApp.</div>
+    <div class="sep"></div>
+    <div class="row two">
+      <div>
+        <h2>Übungen</h2>
+        <div id="drills"></div>
+      </div>
+      <div>
+        <h2>Trainingspläne</h2>
+        <div id="plans"></div>
+      </div>
+    </div>
+  </div>`);
+  root.appendChild(card);
+
+  function drillCard(d){
+    const tags=(d.tags||[]).map(t=>`<span class="chip">${escapeHtml(t)}</span>`).join("");
+    const steps=(d.steps||[]).map(s=>`<li>${escapeHtml(s)}</li>`).join("");
+    const coach=(d.coaching||[]).map(s=>`<li>${escapeHtml(s)}</li>`).join("");
+    return `
+      <div style="padding:10px; border:1px solid var(--line); border-radius:16px; background:rgba(10,10,14,.35); margin:10px 0;">
+        <div class="controls" style="justify-content:space-between;">
+          <div><b>${escapeHtml(d.title)}</b><div class="muted" style="font-size:12px;">Setup: ${escapeHtml(d.setup||"-")} • Equip: ${escapeHtml(d.equip||"-")}</div></div>
+          <div class="controls">
+            <button class="btn secondary" onclick="editDrill('${d.id}')">Bearbeiten</button>
+            <button class="btn" onclick="addToPlanPrompt('${d.id}')">In Plan</button>
+          </div>
+        </div>
+        <div>${tags}</div>
+        <div class="sep"></div>
+        <div class="row two">
+          <div><div class="muted small"><b>Ablauf</b></div><ol class="small muted" style="margin:8px 0 0 18px;">${steps}</ol></div>
+          <div><div class="muted small"><b>Coaching Points</b></div><ul class="small muted" style="margin:8px 0 0 18px;">${coach}</ul></div>
+        </div>
+      </div>
+    `;
+  }
+
+  function renderDrills(){
+    const list=state.library||[];
+    const box=card.querySelector("#drills");
+    if(!list.length){ box.innerHTML=`<p class="muted">Keine Übungen.</p>`; return; }
+    box.innerHTML = list.map(drillCard).join("");
+  }
+
+  function renderPlans(){
+    const box=card.querySelector("#plans");
+    const plans=state.plans||[];
+    if(!plans.length){ box.innerHTML=`<p class="muted">Noch keine Pläne. Klick auf „+ Plan“.</p>`; return; }
+    box.innerHTML = plans.slice().sort((a,b)=>(b.date||"").localeCompare(a.date||"")).map(p=>{
+      const items = (p.items||[]).map(it=>{
+        const d=state.library.find(x=>x.id===it.drillId);
+        return `<li><b>${escapeHtml(d?d.title:"(gelöscht)")}</b> <span class="pill">${it.minutes} min</span></li>`;
+      }).join("");
+      const total=(p.items||[]).reduce((a,b)=>a+(parseInt(b.minutes,10)||0),0);
+      return `
+        <div style="padding:10px; border:1px solid var(--line); border-radius:16px; background:rgba(10,10,14,.35); margin:10px 0;">
+          <div class="controls" style="justify-content:space-between;">
+            <div><b>${escapeHtml(p.title||"Training")}</b><div class="muted" style="font-size:12px;">${escapeHtml(p.date||"")} • Gesamt: ${total} min</div></div>
+            <div class="controls">
+              <button class="btn secondary" onclick="editPlan('${p.id}')">Bearbeiten</button>
+              <button class="btn" onclick="copyPlanWhatsApp('${p.id}')">WhatsApp Text</button>
+              <button class="btn danger" onclick="deletePlan('${p.id}')">Löschen</button>
+            </div>
+          </div>
+          <ol class="small muted" style="margin:8px 0 0 18px;">${items}</ol>
+        </div>
+      `;
+    }).join("");
+  }
+
+  function openDrillModal(drill=null){
+    const d=drill?structuredClone(drill):{id:("dr_"+Math.random().toString(16).slice(2)),title:"",tags:["passing"],equip:"",setup:"",steps:[""],coaching:[""]};
+    const modal=el(`<div style="position:fixed; inset:0; background:rgba(0,0,0,.55); display:grid; place-items:center; padding:16px; z-index:999;">
+      <div class="card" style="max-width:980px; width:100%;">
+        <div class="controls" style="justify-content:space-between;"><h2 style="margin:0;">${drill?"Übung bearbeiten":"Neue Übung"}</h2><button class="btn secondary" id="close">Schließen</button></div>
+        <label>Titel</label><input id="title" value="${escapeAttr(d.title)}" placeholder="z.B. Rondo 4v1 (12')">
+        <div class="inline">
+          <div><label>Tags (Komma)</label><input id="tags" value="${escapeAttr((d.tags||[]).join(", "))}"></div>
+          <div><label>Equipment</label><input id="equip" value="${escapeAttr(d.equip||"")}"></div>
+        </div>
+        <label>Setup</label><input id="setup" value="${escapeAttr(d.setup||"")}">
+        <label>Ablauf (jede Zeile ein Punkt)</label><textarea id="steps">${escapeHtml((d.steps||[]).join("\n"))}</textarea>
+        <label>Coaching Points (jede Zeile ein Punkt)</label><textarea id="coach">${escapeHtml((d.coaching||[]).join("\n"))}</textarea>
+        <div class="sep"></div><div class="controls" style="justify-content:flex-end;"><button class="btn" id="save">Speichern</button></div>
+      </div></div>`);
+    modal.querySelector("#close").onclick=()=>modal.remove();
+    modal.querySelector("#save").onclick=()=>{
+      d.title=modal.querySelector("#title").value.trim()||"Neue Übung";
+      d.tags=modal.querySelector("#tags").value.split(",").map(x=>x.trim()).filter(Boolean);
+      d.equip=modal.querySelector("#equip").value.trim();
+      d.setup=modal.querySelector("#setup").value.trim();
+      d.steps=modal.querySelector("#steps").value.split("\n").map(x=>x.trim()).filter(Boolean);
+      d.coaching=modal.querySelector("#coach").value.split("\n").map(x=>x.trim()).filter(Boolean);
+      const idx=state.library.findIndex(x=>x.id===d.id);
+      if(idx>=0) state.library[idx]=d; else state.library.push(d);
+      saveState(); render(); modal.remove();
+    };
+    document.body.appendChild(modal);
+  }
+
+  function openPlanModal(plan=null){
+    const p=plan?structuredClone(plan):{id:"pl_"+Math.random().toString(16).slice(2), title:"Training (90')", date:new Date().toISOString().slice(0,10), items:[]};
+    const modal=el(`<div style="position:fixed; inset:0; background:rgba(0,0,0,.55); display:grid; place-items:center; padding:16px; z-index:999;">
+      <div class="card" style="max-width:980px; width:100%;">
+        <div class="controls" style="justify-content:space-between;"><h2 style="margin:0;">${plan?"Plan bearbeiten":"Neuer Trainingsplan"}</h2><button class="btn secondary" id="close">Schließen</button></div>
+        <div class="inline" style="margin-top:10px;">
+          <div><label>Titel</label><input id="title" value="${escapeAttr(p.title||"")}"></div>
+          <div><label>Datum</label><input id="date" type="date" value="${p.date||new Date().toISOString().slice(0,10)}"></div>
+        </div>
+        <div class="sep"></div>
+        <h2>Bausteine</h2>
+        <div class="muted small">Tipp: 3 Blöcke (Warm-up / Kombi+Abschluss / Spiel+Transitions).</div>
+        <div style="max-height:340px; overflow:auto;">
+          <table>
+            <thead><tr><th>Übung</th><th>Min</th><th></th></tr></thead>
+            <tbody id="items"></tbody>
+          </table>
+        </div>
+        <div class="controls" style="margin-top:10px;">
+          <select id="pick">
+            ${(state.library||[]).map(d=>`<option value="${d.id}">${escapeHtml(d.title)}</option>`).join("")}
+          </select>
+          <input id="mins" type="number" min="3" max="60" step="1" value="10" style="max-width:120px;">
+          <button class="btn" id="add">+ hinzufügen</button>
+        </div>
+        <div class="sep"></div>
+        <div class="controls" style="justify-content:flex-end;">
+          <button class="btn" id="save">Speichern</button>
+        </div>
+      </div></div>`);
+    function renderItems(){
+      const body=modal.querySelector("#items");
+      body.innerHTML=(p.items||[]).map((it,idx)=>{
+        const d=state.library.find(x=>x.id===it.drillId);
+        return `<tr>
+          <td>${escapeHtml(d?d.title:"(gelöscht)")}</td>
+          <td><input data-min="${idx}" type="number" min="3" max="60" step="1" value="${it.minutes}" style="width:90px;"></td>
+          <td><button class="btn danger" onclick="removePlanItem(${idx})">Entfernen</button></td>
+        </tr>`;
+      }).join("") || `<tr><td colspan="3" class="muted">Noch keine Bausteine.</td></tr>`;
+    }
+    window.removePlanItem=(idx)=>{ p.items.splice(idx,1); renderItems(); };
+    modal.querySelector("#close").onclick=()=>{ delete window.removePlanItem; modal.remove(); };
+    modal.querySelector("#add").onclick=()=>{
+      const drillId=modal.querySelector("#pick").value;
+      const minutes=parseInt(modal.querySelector("#mins").value,10)||10;
+      p.items.push({drillId, minutes});
+      renderItems();
+    };
+    modal.querySelector("#save").onclick=()=>{
+      p.title=modal.querySelector("#title").value.trim()||"Training";
+      p.date=modal.querySelector("#date").value;
+      // update minutes edits
+      modal.querySelectorAll("[data-min]").forEach(inp=>{
+        const idx=parseInt(inp.getAttribute("data-min"),10);
+        p.items[idx].minutes=parseInt(inp.value,10)||p.items[idx].minutes;
+      });
+      const idx=state.plans.findIndex(x=>x.id===p.id);
+      if(idx>=0) state.plans[idx]=p; else state.plans.push(p);
+      saveState(); render(); delete window.removePlanItem; modal.remove();
+    };
+    renderItems();
+    document.body.appendChild(modal);
+  }
+
+  window.editDrill=(id)=>{const d=state.library.find(x=>x.id===id); if(d) openDrillModal(d);};
+  window.addToPlanPrompt=(id)=>{
+    if(!(state.plans||[]).length) return alert("Noch kein Plan vorhanden. Bitte zuerst einen Plan erstellen.");
+    const title = prompt("In welchen Plan? (Titel eingeben, z.B. Training (90'))", state.plans[0].title||"");
+    if(title===null) return;
+    const plan = state.plans.find(p=>p.title===title) || state.plans[0];
+    const mins = parseInt(prompt("Wie viele Minuten?", "10"),10)||10;
+    plan.items = plan.items || [];
+    plan.items.push({drillId:id, minutes:mins});
+    saveState(); render();
+  };
+  window.editPlan=(id)=>{const p=state.plans.find(x=>x.id===id); if(p) openPlanModal(p);};
+  window.deletePlan=(id)=>{ if(!confirm("Plan löschen?")) return; state.plans=state.plans.filter(x=>x.id!==id); saveState(); render(); };
+
+  window.copyPlanWhatsApp=(id)=>{
+    const p=state.plans.find(x=>x.id===id); if(!p) return;
+    const lines=[];
+    lines.push(`⚽ *${p.title}* (${p.date})`);
+    let total=0;
+    (p.items||[]).forEach((it,i)=>{
+      const d=state.library.find(x=>x.id===it.drillId);
+      const t=d?d.title:"(Übung gelöscht)";
+      total += parseInt(it.minutes,10)||0;
+      lines.push(`${i+1}. ${t} – ${it.minutes} min`);
+    });
+    lines.push(`Gesamt: ${total} min`);
+    const txt=lines.join("\n");
+    navigator.clipboard?.writeText(txt).then(()=>alert("WhatsApp Text kopiert.")).catch(()=>prompt("Kopieren:", txt));
+  };
+
+  card.querySelector("#newDrill").onclick=()=>openDrillModal(null);
+  card.querySelector("#newPlan").onclick=()=>openPlanModal(null);
+
+  renderDrills();
+  renderPlans();
+  return root;
+}
+
+/* Entwicklung (Kurven) */
+function renderDevelopment(){
+  const root=el(`<div class="grid"></div>`);
+  const players=state.players||[];
+  const card=el(`<div class="card">
+    <div class="controls" style="justify-content:space-between;">
+      <h2 style="margin:0;">Spieler-Entwicklung</h2>
+      <div class="controls">
+        <button class="btn secondary" id="snapshot">Snapshot jetzt speichern</button>
+      </div>
+    </div>
+    <div class="sep"></div>
+    <div class="row two">
+      <div>
+        <label>Ansicht</label>
+<select id="viewPick">
+  <option value="player">Spieler</option>
+  <option value="team_core">Team-Trend (Kernspieler)</option>
+  <option value="team_all">Team-Trend (alle)</option>
+</select>
+<div class="sep"></div>
+<label>Spieler auswählen</label>
+<select id="playerPick">$1</select>
+        <label>Welche Attribute zeigen?</label>
+        <div class="controls" id="attrPick" style="margin-top:6px; gap:6px; flex-wrap:wrap;"></div>
+        <div class="sep"></div>
+        <div class="notice small">Hinweis: Historie wird automatisch bei <b>Trainings</b> für anwesende Spieler gespeichert (oder per Snapshot-Button).</div>
+      </div>
+      <div>
+        <h2>Kurve</h2>
+        <div id="chart"></div>
+      </div>
+    </div>
+    <div class="sep"></div>
+    <h2>Historie Tabelle</h2>
+    <div style="overflow:auto;" id="table"></div>
+  </div>`);
+  root.appendChild(card);
+
+  // attribute toggles (default: passing, positioning, communication, stamina)
+  const defaultKeys=["passing","positioning","communication","stamina"];
+  let selectedKeys=new Set(defaultKeys);
+
+  function renderAttrToggles(){
+    const box=card.querySelector("#attrPick");
+    box.innerHTML = ATTRS.map(([k,label])=>{
+      const active = selectedKeys.has(k);
+      return `<button class="tab ${active?"active":""}" data-k="${k}" style="padding:7px 10px;">${label}</button>`;
+    }).join("");
+    box.querySelectorAll("[data-k]").forEach(b=>{
+      b.onclick=()=>{
+        const k=b.getAttribute("data-k");
+        if(selectedKeys.has(k)){
+          if(selectedKeys.size<=1) return;
+          selectedKeys.delete(k);
+        } else {
+          if(selectedKeys.size>=4) return alert("Max. 4 Attribute gleichzeitig (übersichtlich).");
+          selectedKeys.add(k);
+        }
+        update();
+      };
+    });
+  }
+
+  function getPlayer(){
+    const id=card.querySelector("#playerPick").value;
+    return state.players.find(p=>p.id===id) || state.players[0];
+  }
+
+  function update(){
+    renderAttrToggles();
+    const view=card.querySelector("#viewPick").value;
+    const keys=[...selectedKeys];
+    let title="";
+    let hist=[];
+    if(view==="player"){
+      const p=getPlayer();
+      title=p.name;
+      hist=(p.history||[]).slice().sort((a,b)=>(a.date||"").localeCompare(b.date||""));
+    } else if(view==="team_core"){
+      title="Team (Kernspieler)";
+      hist=buildTeamHistory(p=>p.squadRole==="Kern");
+    } else {
+      title="Team (alle)";
+      hist=buildTeamHistory(null);
+    }
+    card.querySelector("#chart").innerHTML = svgLineChart(hist, keys, 760, 260);
+// table
+    if(!hist.length){ card.querySelector("#table").innerHTML=`<p class="muted">Noch keine Historie für ${escapeHtml(title)}.</p>`; return; }
+    const rows = hist.slice(-20).reverse().map(h=>{
+      const cols = keys.map(k=>`<td class="mono">${round1(h.attrs?.[k]??0)}</td>`).join("");
+      return `<tr><td class="mono">${h.date||""}</td>${cols}</tr>`;
+    }).join("");
+    card.querySelector("#table").innerHTML = `
+      <table>
+        <thead><tr><th>Datum</th>${keys.map(k=>`<th>${labelAttr(k)}</th>`).join("")}</tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+      <div class="muted small">Anzeige: letzte 20 Snapshots (insgesamt wird mehr gespeichert).</div>
+    `;
+  }
+
+  card.querySelector("#playerPick").onchange=update;
+
+  card.querySelector("#viewPick").onchange=()=>{
+    const v=card.querySelector("#viewPick").value;
+    card.querySelector("#playerPick").disabled = (v!=="player");
+    update();
+  };
+
+  card.querySelector("#snapshot").onclick=()=>{
+    const view=card.querySelector("#viewPick").value;
+    if(view!=="player") return alert("Snapshot ist nur für einzelne Spieler verfügbar.");
+    const p=getPlayer();
+    p.history = p.history || [];
+    p.history.push({date:new Date().toISOString().slice(0,10), attrs:structuredClone(p.attrs)});
+    if(p.history.length>120) p.history=p.history.slice(p.history.length-120);
+    saveState(); update();
+    alert("Snapshot gespeichert.");
+  };
+
+  update();
+  return root;
+}
+
+/* Taktik */
+function renderTactics(){
+  return el(`<div class="grid"><div class="card">
+    <h2>Grundtaktik – 2–2–1 (5+1)</h2>
+    <div class="notice">Fokus: Kurzpass & Kontrolle, kompakt verteidigen, wenig Risiko.</div>
+    <div class="sep"></div>
+    <div class="controls">
+      <span class="chip gold">Ball &gt; Gegner</span>
+      <span class="chip gold">Rückpass erlaubt</span>
+      <span class="chip gold">Kein Dribbling hinten</span>
+      <span class="chip gold">3 Sek. Druck</span>
+      <span class="chip gold">Reden!</span>
+      <span class="chip">Position halten &gt; Ball jagen</span>
+      <span class="chip">Erste 5 Min sicher</span>
+      <span class="chip">Führung = Kontrolle</span>
+    </div>
+    <div class="sep"></div>
+    <p class="muted"><b>Merksatz:</b> „Ordnung schlägt Tempo.“</p>
+    <p class="muted"><b>6+1:</b> Extra Spieler als 3. Verteidiger oder 3. Mittelfeldspieler – nicht standardmäßig als 2. Stürmer.</p>
+  </div></div>`);
+}
+
+/* Backup */
+function renderBackup(){
+  const root=el(`<div class="grid"></div>`);
+  const card=el(`<div class="row two">
+    <div class="card"><h2>Export</h2><div class="controls"><button class="btn" id="exp">Exportieren</button><button class="btn secondary" id="copy">Kopieren</button></div>
+      <div class="sep"></div><textarea id="out" class="mono" placeholder="Export JSON..."></textarea></div>
+    <div class="card"><h2>Import</h2><textarea id="inp" class="mono" placeholder="JSON hier einfügen..."></textarea>
+      <div class="sep"></div><div class="controls"><button class="btn danger" id="imp">Import (überschreibt)</button><button class="btn secondary" id="reset">Reset (Seed)</button></div></div>
+  </div>`);
+  const out=card.querySelector("#out");
+  card.querySelector("#exp").onclick=()=>{out.value=JSON.stringify(state,null,2);};
+  card.querySelector("#copy").onclick=async ()=>{try{await navigator.clipboard.writeText(out.value||JSON.stringify(state,null,2)); alert("Kopiert.");}catch(e){alert("Bitte manuell kopieren.");}};
+  card.querySelector("#imp").onclick=()=>{const txt=card.querySelector("#inp").value.trim(); if(!txt) return alert("Kein JSON.");
+    if(!confirm("Import überschreibt alles. Fortfahren?")) return;
+    try{const p=JSON.parse(txt); state=Object.assign(structuredClone(SEED),p); saveState(); render(); alert("Import OK.");}catch(e){alert("Ungültiges JSON.");}
+  };
+  card.querySelector("#reset").onclick=()=>{if(!confirm("Zurücksetzen auf Seed (Roster+Spielplan)?")) return; state=structuredClone(SEED); saveState(); render();};
+  root.appendChild(card); return root;
+}
+
+render();
+</script>
+<script>
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("./sw.js").catch(console.warn);
+  });
+}
+</script>
+
+</body></html>
